@@ -102,9 +102,15 @@ export interface WhoisResult {
   status: string;
 }
 
+export interface MxResult {
+  preference: number;
+  mail_server: string;
+}
+
 export interface Results {
   whois?: ModuleResult<WhoisResult>;
-  mx?: ModuleResult;
+  mx?: ModuleResult<MxResult[]>;
+  txt?: ModuleResult<string[]>;
   subdomains?: ModuleResult<SubdomainsResult>;
   headers?: ModuleResult<HeadersResult>;
   tech?: ModuleResult<TechResult[]>;

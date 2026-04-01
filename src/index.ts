@@ -24,7 +24,7 @@ async function runModules() {
 
   target = normalizeUrl(target);
 
-  const passiveFlags = ['whois', 'mx', 'subdomains', 'geo'];
+  const passiveFlags = ['whois', 'mx', 'txt', 'subdomains', 'geo'];
   const activeFlags = [
     'headers',
     'tech',
@@ -123,6 +123,7 @@ program
   .option('-oN, --output <file>', 'Save output to file')
   .option('-w, --whois', 'Domain registration info via RDAP (passive)')
   .option('-m, --mx', 'MX records (passive)')
+  .option('-t, --txt', 'TXT records - SPF, DKIM (passive)')
   .option('-S, --subdomains', 'Find subdomains (passive)')
   .option('-h, --headers', 'HTTP headers (active)')
   .option('-T, --tech', 'Detect technologies (active)')
