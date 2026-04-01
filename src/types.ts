@@ -92,13 +92,21 @@ export interface SitemapResult {
   url: string;
 }
 
+export interface WhoisResult {
+  domain_name: string;
+  nameservers: string[];
+  registrar: string;
+  creation_date: string;
+  expiration_date: string;
+  remaining_time_in_days: number | string;
+  status: string;
+}
+
 export interface Results {
-  whois?: ModuleResult;
-  dns?: ModuleResult;
+  whois?: ModuleResult<WhoisResult>;
   mx?: ModuleResult;
   subdomains?: ModuleResult<SubdomainsResult>;
   headers?: ModuleResult<HeadersResult>;
-  security?: ModuleResult<SecurityResult>;
   tech?: ModuleResult<TechResult[]>;
   wplugins?: ModuleResult<WpluginsResult>;
   ssl?: ModuleResult<SSLResult>;

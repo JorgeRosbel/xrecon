@@ -24,10 +24,9 @@ async function runModules() {
 
   target = normalizeUrl(target);
 
-  const passiveFlags = ['whois', 'dns', 'mx', 'txt', 'subdomains', 'geo'];
+  const passiveFlags = ['whois', 'mx', 'subdomains', 'geo'];
   const activeFlags = [
     'headers',
-    'security',
     'tech',
     'wplugins',
     'ssl',
@@ -122,18 +121,15 @@ program
   .option('-H, --hybrid', 'Run both active and passive modules')
   .option('-P, --passive', 'Run only passive modules')
   .option('-oN, --output <file>', 'Save output to file')
-  .option('-w, --whois', 'Domain registration info (passive)')
-  .option('-d, --dns', 'DNS A records (passive)')
+  .option('-w, --whois', 'Domain registration info via RDAP (passive)')
   .option('-m, --mx', 'MX records (passive)')
-  .option('-t, --txt', 'TXT records - SPF, DKIM (passive)')
   .option('-S, --subdomains', 'Find subdomains (passive)')
   .option('-h, --headers', 'HTTP headers (active)')
-  .option('-c, --security', 'Security headers (active)')
   .option('-T, --tech', 'Detect technologies (active)')
   .option('-W, --wplugins', 'WordPress plugins (active)')
   .option('-s, --ssl', 'SSL certificate info (active)')
   .option('-g, --geo', 'Geolocation (active)')
-  .option('-O, --os', 'OS detection (active)')
+  .option('-O, --os', 'OS detection via TTL (active)')
   .option('-i, --metadata', 'Page title and meta description (active)')
   .option('-e, --emails', 'Extract emails (active)')
   .option('-p, --phones', 'Extract phone numbers (active)')
