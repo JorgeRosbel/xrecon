@@ -58,12 +58,14 @@ export type HeadersResult = string[];
 
 export type SecurityResult = string[];
 
+export type SubdomainsResult = string[];
+
 export interface Results {
   whois?: ModuleResult;
   dns?: ModuleResult;
   mx?: ModuleResult;
   txt?: ModuleResult;
-  subdomains?: ModuleResult;
+  subdomains?: ModuleResult<SubdomainsResult>;
   headers?: ModuleResult<HeadersResult>;
   security?: ModuleResult<SecurityResult>;
   tech?: ModuleResult;
