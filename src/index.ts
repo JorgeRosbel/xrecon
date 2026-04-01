@@ -1,6 +1,7 @@
 import dns from 'dns';
 import { promisify } from 'util';
 import { program } from 'commander';
+import fs from 'fs/promises';
 
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
@@ -9,6 +10,7 @@ import { chromium, type Browser, type BrowserContext, type Page } from 'playwrig
 import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
 import { getHtml } from '@/utils/get_html';
+import { generateHtmlOutput } from '@/utils/output-html';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
 const VERSION = '0.0.1';
@@ -184,6 +186,29 @@ async function runModules() {
 
   const output: ScanOutput = { target, results: results as Results };
   console.log(JSON.stringify(output, null, 2));
+
+  const outputJson = opts.outputJson;
+  const outputHtml = opts.outputHtml;
+  const outputText = opts.output;
+
+  if (outputJson) {
+    const jsonFilename = typeof outputJson === 'string' ? outputJson : 'output.json';
+    await fs.writeFile(jsonFilename, JSON.stringify(output, null, 2), 'utf-8');
+    console.error(`JSON output saved to: ${jsonFilename}`);
+  }
+
+  if (outputHtml) {
+    const htmlFilename = typeof outputHtml === 'string' ? outputHtml : 'output.html';
+    const htmlContent = generateHtmlOutput(output);
+    await fs.writeFile(htmlFilename, htmlContent, 'utf-8');
+    console.error(`HTML output saved to: ${htmlFilename}`);
+  }
+
+  if (outputText) {
+    const textContent = JSON.stringify(output, null, 2);
+    await fs.writeFile(outputText, textContent, 'utf-8');
+    console.error(`Output saved to: ${outputText}`);
+  }
 }
 
 program
@@ -195,7 +220,9 @@ program
   .argument('<target>', 'Target URL or domain')
   .option('-H, --hybrid', 'Run both active and passive modules')
   .option('-P, --passive', 'Run only passive modules')
-  .option('-oN, --output <file>', 'Save output to file')
+  .option('-oN, --output <file>', 'Save output to file (plain text)')
+  .option('-oJ, --output-json [file]', 'Save output as JSON file')
+  .option('-oH, --output-html [file]', 'Save output as HTML file')
   .option('-w, --whois', 'Domain registration info via RDAP [PASSIVE]')
   .option('-m, --mx', 'MX records [PASSIVE]')
   .option('-t, --txt', 'TXT records - SPF, DKIM [PASSIVE]')

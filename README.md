@@ -41,13 +41,15 @@ xrecon example.com -H -oN results.json
 
 ### Global Options
 
-| Flag                   | Description                         |
-| ---------------------- | ----------------------------------- |
-| `-H, --hybrid`         | Run both active and passive modules |
-| `-P, --passive`        | Run only passive modules            |
-| `-oN, --output <file>` | Save output to file                 |
-| `-V, --version`        | Show version number                 |
-| `--help`               | Display help information            |
+| Flag                        | Description                                     |
+| --------------------------- | ----------------------------------------------- |
+| `-H, --hybrid`              | Run both active and passive modules             |
+| `-P, --passive`             | Run only passive modules                        |
+| `-oN, --output <file>`      | Save output to file (plain text)                |
+| `-oJ, --output-json [file]` | Save output as JSON file (default: output.json) |
+| `-oH, --output-html [file]` | Save output as HTML file (default: output.html) |
+| `-V, --version`             | Show version number                             |
+| `--help`                    | Display help information                        |
 
 ### Passive Modules
 
@@ -114,7 +116,27 @@ xrecon example.com -e -p
 ### Save results to file
 
 ```bash
-xrecon example.com -H -oN scan-results.json
+xrecon example.com -H -oN scan-results.txt
+```
+
+### Save results as JSON
+
+```bash
+xrecon example.com -H -oJ
+# Saves to output.json
+
+xrecon example.com -H -oJ scan.json
+# Saves to scan.json
+```
+
+### Save results as HTML
+
+```bash
+xrecon example.com -H -oH
+# Saves to output.html
+
+xrecon example.com -H -oH report.html
+# Saves to report.html
 ```
 
 ## Requirements
