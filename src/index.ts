@@ -38,6 +38,7 @@ async function runModules() {
     'sitemap',
     'robots',
     'social',
+    'routes',
   ];
 
   const selectedPassive = passiveFlags.filter(flag => opts[flag]);
@@ -138,7 +139,8 @@ program
   .option('-p, --phones', 'Extract phone numbers [ACTIVE]')
   .option('-M, --sitemap', 'Sitemap URLs [ACTIVE]')
   .option('-r, --robots', 'Robots.txt [ACTIVE]')
-  .option('-l, --social', 'Social networks [ACTIVE]');
+  .option('-l, --social', 'Social networks [ACTIVE]')
+  .option('-R, --routes', 'Public routes from all sitemaps [ACTIVE]');
 
 program.parse(process.argv);
 

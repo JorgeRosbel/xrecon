@@ -108,6 +108,8 @@ export interface MxResult {
   mail_server: string;
 }
 
+export type RoutesResult = string[];
+
 export interface Results {
   whois?: ModuleResult<WhoisResult>;
   mx?: ModuleResult<MxResult[]>;
@@ -126,6 +128,7 @@ export interface Results {
   sitemap?: ModuleResult<SitemapResult>;
   robots?: ModuleResult<RobotsResult>;
   social?: ModuleResult<SocialResult>;
+  routes?: ModuleResult<RoutesResult>;
 }
 
 export interface ScanOutput {
