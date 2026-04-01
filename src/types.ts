@@ -60,6 +60,38 @@ export type SecurityResult = string[];
 
 export type SubdomainsResult = string[];
 
+export interface SSLResult {
+  commonName: string;
+  issuer: string;
+  validFrom: string;
+  validTo: string;
+  daysLeft: number;
+}
+
+export interface RobotsResult {
+  url: string;
+  disallowed: string[];
+  allowed: string[];
+  sitemaps: string[];
+}
+
+export interface TechResult {
+  name: string;
+  category: string;
+  evidence: string;
+}
+
+export type WpluginsResult = string[];
+
+export interface OSResult {
+  os: string;
+  evidence: string;
+}
+
+export interface SitemapResult {
+  url: string;
+}
+
 export interface Results {
   whois?: ModuleResult;
   dns?: ModuleResult;
@@ -68,16 +100,16 @@ export interface Results {
   subdomains?: ModuleResult<SubdomainsResult>;
   headers?: ModuleResult<HeadersResult>;
   security?: ModuleResult<SecurityResult>;
-  tech?: ModuleResult;
-  wplugins?: ModuleResult;
-  ssl?: ModuleResult;
+  tech?: ModuleResult<TechResult[]>;
+  wplugins?: ModuleResult<WpluginsResult>;
+  ssl?: ModuleResult<SSLResult>;
   geo?: ModuleResult<GeoResult>;
-  os?: ModuleResult;
+  os?: ModuleResult<OSResult>;
   metadata?: ModuleResult<MetadataResult>;
   emails?: ModuleResult<EmailResult>;
   phones?: ModuleResult<PhoneResult>;
-  sitemap?: ModuleResult;
-  robots?: ModuleResult;
+  sitemap?: ModuleResult<SitemapResult>;
+  robots?: ModuleResult<RobotsResult>;
   social?: ModuleResult<SocialResult>;
 }
 
