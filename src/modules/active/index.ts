@@ -12,3 +12,4 @@ export { robots } from './robots';
 export { social } from './social';
 export { routes } from './routes';
 export { cookies } from './cookies';
+export { storage } from './storage';

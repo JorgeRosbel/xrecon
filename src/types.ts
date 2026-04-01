@@ -108,6 +108,27 @@ export interface MxResult {
   mail_server: string;
 }
 
+export interface StorageItem {
+  key: string;
+  value: string;
+}
+
+export interface DecodedJwt {
+  header: Record<string, unknown>;
+  payload: Record<string, unknown>;
+  signature: string;
+}
+
+export interface StorageResult {
+  localStorage: StorageItem[];
+  sessionStorage: StorageItem[];
+  jwtTokens: {
+    key: string;
+    storage: 'localStorage' | 'sessionStorage';
+    decoded: DecodedJwt | null;
+  }[];
+}
+
 export interface CookieResult {
   name: string;
   value: string;
@@ -141,6 +162,7 @@ export interface Results {
   social?: ModuleResult<SocialResult>;
   routes?: ModuleResult<RoutesResult>;
   cookies?: ModuleResult<CookieResult[]>;
+  storage?: ModuleResult<StorageResult>;
 }
 
 export interface ScanOutput {
