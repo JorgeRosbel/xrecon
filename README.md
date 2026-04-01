@@ -4,18 +4,6 @@ OSINT CLI tool for web reconnaissance - gather passive and active information ab
 
 ## Installation
 
-### Using npm
-
-```bash
-npm install -g @jorge-rosbel/xrecon
-```
-
-### Using pnpm
-
-```bash
-pnpm add -g @jorge-rosbel/xrecon
-```
-
 ### From source
 
 ```bash
@@ -24,13 +12,13 @@ git clone https://github.com/JorgeRosbel/xrecon.git
 cd xrecon
 
 # Install dependencies
-npm install
+pnpm install
 
 # Build the CLI
-npm run build
+pnpm build
 
 # Link globally
-npm link
+pnpm link
 ```
 
 ## Usage
@@ -129,25 +117,10 @@ xrecon example.com -e -p
 xrecon example.com -H -oN scan-results.json
 ```
 
-## Output
-
-Results are output as JSON to stdout:
-
-```json
-{
-  "target": "https://example.com",
-  "results": {
-    "whois": { "success": true, "data": {...} },
-    "ssl": { "success": true, "data": {...} },
-    ...
-  }
-}
-```
-
 ## Requirements
 
 - Node.js >= 18
-- npm or pnpm
+- pnpm
 
 ## License
 
