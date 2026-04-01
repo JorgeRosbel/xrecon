@@ -1,37 +1,68 @@
-import axios from 'axios';
-import type { ActiveModule, ModuleResult } from '@/types';
+import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
-export type WpluginsResult = string[];
+interface WpPlugin {
+  name: string;
+  version: string;
+}
+
+export type WpluginsResult = WpPlugin[];
 
 export const wplugins: ActiveModule = {
   name: 'wplugins',
-  async run(target: string): Promise<ModuleResult<WpluginsResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<WpluginsResult>> {
     try {
-      const hostname = target.replace(/^https?:\/\//, '').split('/')[0];
-      const url = `https://${hostname}/wp-content/plugins/`;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
 
-      const response = await axios.get(url, {
-        timeout: 10000,
-        validateStatus: () => true,
-      });
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const html = data.html;
 
-      if (response.status !== 200) {
-        return {
-          success: false,
-          error: 'WordPress not detected or plugins directory not accessible',
-        };
+      const plugins: Record<string, WpPlugin> = {};
+
+      const patternPath =
+        /\/wp-content\/plugins\/([a-zA-Z0-9_-]+)(?:\/[^"'>\s]*)?(?:["'\s].*?(?:ver|version)[=\s]+["']?([0-9][0-9a-zA-Z._-]*))?/gi;
+      let match: RegExpExecArray | null;
+      while ((match = patternPath.exec(html)) !== null) {
+        const name = match[1];
+        const version = match[2];
+        if (!plugins[name]) {
+          plugins[name] = { name, version: version || 'unknown' };
+        } else if (version && plugins[name].version === 'unknown') {
+          plugins[name].version = version;
+        }
       }
 
-      const html = response.data as string;
-      const pluginMatches = html.match(/\/wp-content\/plugins\/([a-zA-Z0-9_-]+)\//g);
-
-      if (!pluginMatches) {
-        return { success: false, error: 'No plugins found' };
+      const patternVer =
+        /\/wp-content\/plugins\/([a-zA-Z0-9_-]+)\/[^"'>\s]*\?(?:[^"'>\s]*&)?ver=([0-9][0-9a-zA-Z._-]*)/gi;
+      while ((match = patternVer.exec(html)) !== null) {
+        const name = match[1];
+        const version = match[2];
+        if (plugins[name] && plugins[name].version === 'unknown') {
+          plugins[name].version = version;
+        }
       }
 
-      const plugins = [...new Set(pluginMatches.map(m => m.split('/')[3]))];
+      const patternComment =
+        /<!--[^-]*?plugin[s]?\s*[:\-]?\s*([a-zA-Z0-9][a-zA-Z0-9_\- ]{2,40}?)(?:\s+v?([0-9][0-9a-zA-Z._-]*))?(?:\s+active|\s+enabled|-->)/gi;
+      while ((match = patternComment.exec(html)) !== null) {
+        const rawName = match[1].trim();
+        const version = match[2];
+        const slug = rawName.toLowerCase().replace(/ /g, '-');
+        if (slug && !plugins[slug]) {
+          plugins[slug] = { name: rawName, version: version || 'unknown' };
+        }
+      }
 
-      return { success: true, data: plugins };
+      const result = Object.values(plugins).slice(0, 20);
+
+      if (result.length === 0) {
+        return { success: false, error: 'No WordPress plugins found' };
+      }
+
+      return { success: true, data: result };
     } catch (error) {
       return {
         success: false,
