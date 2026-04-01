@@ -124,7 +124,7 @@ async function runModules() {
   const results: Partial<Results> = {};
 
   const runPassiveModules = async (moduleNames: string[]) => {
-    for (const moduleName of moduleNames) {
+    const promises = moduleNames.map(async moduleName => {
       const mod = passiveModules[moduleName as keyof typeof passiveModules];
       if (mod?.run) {
         try {
@@ -143,11 +143,12 @@ async function runModules() {
           };
         }
       }
-    }
+    });
+    await Promise.all(promises);
   };
 
   const runActiveModules = async (moduleNames: string[]) => {
-    for (const moduleName of moduleNames) {
+    const promises = moduleNames.map(async moduleName => {
       const mod = activeModules[moduleName as keyof typeof activeModules];
       if (mod?.run) {
         try {
@@ -160,7 +161,8 @@ async function runModules() {
           };
         }
       }
-    }
+    });
+    await Promise.all(promises);
   };
 
   if (runPassiveOnly) {
