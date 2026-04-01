@@ -1,9 +1,20 @@
-import axios from 'axios';
+import { exec } from 'child_process';
+import { promisify } from 'util';
 import type { ActiveModule, ModuleResult } from '@/types';
+
+const execAsync = promisify(exec);
 
 export interface OSResult {
   os: string;
+  ttl: number;
   evidence: string;
+}
+
+function detectOSFromTTL(ttl: number): string {
+  if (ttl <= 64) return 'Linux/Unix';
+  if (ttl <= 128) return 'Windows';
+  if (ttl <= 255) return 'Unix/Solaris/AIX';
+  return 'Unknown';
 }
 
 export const os: ActiveModule = {
@@ -12,58 +23,26 @@ export const os: ActiveModule = {
     try {
       const hostname = target.replace(/^https?:\/\//, '').split('/')[0];
 
-      let response;
-      try {
-        response = await axios.head(`https://${hostname}`, {
-          timeout: 10000,
-          validateStatus: () => true,
-        });
-      } catch {
-        response = await axios.head(`http://${hostname}`, {
-          timeout: 10000,
-          validateStatus: () => true,
-        });
+      const { stdout } = await execAsync(`ping -c 1 -W 5 ${hostname}`, {
+        timeout: 10000,
+      });
+
+      const ttlMatch = stdout.match(/ttl=(\d+)/i);
+      if (!ttlMatch) {
+        return { success: false, error: 'Could not extract TTL from ping response' };
       }
 
-      const serverHeader = response.headers['server'] as string;
-      let detectedOS = 'Unknown';
-      let evidence = '';
+      const ttl = parseInt(ttlMatch[1], 10);
+      const detectedOS = detectOSFromTTL(ttl);
 
-      if (serverHeader) {
-        const server = serverHeader.toLowerCase();
-        if (server.includes('ubuntu') || server.includes('debian')) {
-          detectedOS = 'Linux (Ubuntu/Debian)';
-          evidence = `Server: ${serverHeader}`;
-        } else if (
-          server.includes('centos') ||
-          server.includes('red hat') ||
-          server.includes('fedora')
-        ) {
-          detectedOS = 'Linux (RHEL/CentOS/Fedora)';
-          evidence = `Server: ${serverHeader}`;
-        } else if (server.includes('alpine')) {
-          detectedOS = 'Linux (Alpine)';
-          evidence = `Server: ${serverHeader}`;
-        } else if (server.includes('freebsd') || server.includes('openbsd')) {
-          detectedOS = 'BSD';
-          evidence = `Server: ${serverHeader}`;
-        } else if (server.includes('windows') || server.includes('iis')) {
-          detectedOS = 'Windows';
-          evidence = `Server: ${serverHeader}`;
-        } else if (server.includes('nginx')) {
-          detectedOS = 'Linux (likely)';
-          evidence = `Server: ${serverHeader}`;
-        } else if (server.includes('apache')) {
-          detectedOS = 'Linux/Unix (likely)';
-          evidence = `Server: ${serverHeader}`;
-        }
-      }
-
-      if (detectedOS === 'Unknown') {
-        evidence = 'No OS indicators found in headers';
-      }
-
-      return { success: true, data: { os: detectedOS, evidence } };
+      return {
+        success: true,
+        data: {
+          os: detectedOS,
+          ttl,
+          evidence: `TTL=${ttl} (typical range: Linux/Unix=64, Windows=128, Solaris/AIX=254)`,
+        },
+      };
     } catch (error) {
       return {
         success: false,
