@@ -108,6 +108,17 @@ export interface MxResult {
   mail_server: string;
 }
 
+export interface CookieResult {
+  name: string;
+  value: string;
+  domain: string;
+  path: string;
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: string;
+  expires: number;
+}
+
 export type RoutesResult = string[];
 
 export interface Results {
@@ -129,6 +140,7 @@ export interface Results {
   robots?: ModuleResult<RobotsResult>;
   social?: ModuleResult<SocialResult>;
   routes?: ModuleResult<RoutesResult>;
+  cookies?: ModuleResult<CookieResult[]>;
 }
 
 export interface ScanOutput {
