@@ -114,6 +114,7 @@ export interface Results {
   txt?: ModuleResult<string[]>;
   subdomains?: ModuleResult<SubdomainsResult>;
   headers?: ModuleResult<HeadersResult>;
+  security?: ModuleResult<SecurityResult>;
   tech?: ModuleResult<TechResult[]>;
   wplugins?: ModuleResult<WpluginsResult>;
   ssl?: ModuleResult<SSLResult>;

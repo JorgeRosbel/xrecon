@@ -27,6 +27,7 @@ async function runModules() {
   const passiveFlags = ['whois', 'mx', 'txt', 'subdomains', 'geo'];
   const activeFlags = [
     'headers',
+    'security',
     'tech',
     'wplugins',
     'ssl',
@@ -126,6 +127,7 @@ program
   .option('-t, --txt', 'TXT records - SPF, DKIM [PASSIVE]')
   .option('-S, --subdomains', 'Find subdomains [PASSIVE]')
   .option('-h, --headers', 'HTTP headers [ACTIVE]')
+  .option('-c, --security', 'Security headers [ACTIVE]')
   .option('-T, --tech', 'Detect technologies [ACTIVE]')
   .option('-W, --wplugins', 'WordPress plugins [ACTIVE]')
   .option('-s, --ssl', 'SSL certificate info [ACTIVE]')
