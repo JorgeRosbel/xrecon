@@ -39,6 +39,14 @@ Based on analyzed changes, determine type:
 git commit -m "<generated message>"
 ```
 
+### Step 5: Push to Remote
+
+```bash
+git branch --show-current | xargs -I {} git push -u origin {}
+```
+
+Always push to the current branch (never hardcode branch name).
+
 ## Format
 
 ```
