@@ -10,15 +10,6 @@ const HEADERS_TO_CHECK = [
   'permissions-policy',
 ];
 
-const REQUIRED_HEADERS: Record<string, string> = {
-  'strict-transport-security': 'HSTS - Enforces HTTPS',
-  'content-security-policy': 'CSP - Prevents XSS attacks',
-  'x-frame-options': 'Prevents clickjacking',
-  'x-content-type-options': 'Prevents MIME sniffing',
-  'referrer-policy': 'Controls referrer information',
-  'permissions-policy': 'Controls browser features',
-};
-
 export const security: ActiveModule = {
   name: 'security',
   async run(target: string): Promise<ModuleResult<SecurityResult>> {

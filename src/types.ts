@@ -96,7 +96,6 @@ export interface Results {
   whois?: ModuleResult;
   dns?: ModuleResult;
   mx?: ModuleResult;
-  txt?: ModuleResult;
   subdomains?: ModuleResult<SubdomainsResult>;
   headers?: ModuleResult<HeadersResult>;
   security?: ModuleResult<SecurityResult>;
