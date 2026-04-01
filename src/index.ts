@@ -1,4 +1,10 @@
+import dns from 'dns';
+import { promisify } from 'util';
 import { program } from 'commander';
+
+const resolve4 = promisify(dns.resolve4);
+const resolve6 = promisify(dns.resolve6);
+
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
@@ -19,6 +25,17 @@ function needsPlaywright(moduleNames: string[]): boolean {
   return moduleNames.some(name => pwModules.includes(name));
 }
 
+async function validateDomain(hostname: string): Promise<boolean> {
+  try {
+    const [a, aaaa] = await Promise.allSettled([resolve4(hostname), resolve6(hostname)]);
+    if (a.status === 'fulfilled' && a.value.length > 0) return true;
+    if (aaaa.status === 'fulfilled' && aaaa.value.length > 0) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 async function runModules() {
   const opts = program.opts();
 
@@ -29,6 +46,13 @@ async function runModules() {
   }
 
   target = normalizeUrl(target);
+  const hostname = target.replace(/^https?:\/\//, '').split('/')[0];
+
+  const isValid = await validateDomain(hostname);
+  if (!isValid) {
+    console.error(`Error: Could not resolve domain "${hostname}"`);
+    process.exit(1);
+  }
 
   const passiveFlags = ['whois', 'mx', 'txt', 'subdomains', 'geo'];
   const activeFlags = [
@@ -74,19 +98,26 @@ async function runModules() {
   let browserContext: BrowserContext | null = null;
 
   if (runActive) {
-    sharedHtmlData = await getHtml(target);
+    try {
+      sharedHtmlData = await getHtml(target);
 
-    if (needsPlaywright(activeToRun)) {
-      browser = await chromium.launch({ headless: true });
-      browserContext = await browser.newContext({
-        userAgent:
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      });
+      if (needsPlaywright(activeToRun)) {
+        browser = await chromium.launch({ headless: true });
+        browserContext = await browser.newContext({
+          userAgent:
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        });
 
-      const page: Page = await browserContext.newPage();
-      await page.goto(sharedHtmlData.url, { waitUntil: 'networkidle', timeout: 30000 });
+        const page: Page = await browserContext.newPage();
+        await page.goto(sharedHtmlData.url, { waitUntil: 'networkidle', timeout: 30000 });
 
-      sharedHtmlData.browserContext = browserContext;
+        sharedHtmlData.browserContext = browserContext;
+      }
+    } catch (error) {
+      console.error(
+        `Warning: Could not fetch page data: ${error instanceof Error ? error.message : String(error)}`
+      );
+      sharedHtmlData = undefined;
     }
   }
 
