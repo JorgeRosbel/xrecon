@@ -1,5 +1,4 @@
-import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
-import type { ActiveModule, ModuleResult } from '@/types';
+import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
 
 interface StorageItem {
   key: string;
@@ -42,23 +41,19 @@ function decodeJwt(token: string): DecodedJwt | null {
 
 export const storage: ActiveModule = {
   name: 'storage',
-  async run(target: string): Promise<ModuleResult<StorageResult>> {
-    let browser: Browser | null = null;
-
+  async run(_target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<StorageResult>> {
     try {
-      const fullUrl =
-        target.startsWith('http://') || target.startsWith('https://')
-          ? target
-          : `https://${target}`;
+      const context = sharedData?.browserContext;
+      if (!context) {
+        return { success: false, error: 'Browser context not available' };
+      }
 
-      browser = await chromium.launch({ headless: true });
-      const context: BrowserContext = await browser.newContext({
-        userAgent:
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      });
+      const pages = context.pages();
+      if (pages.length === 0) {
+        return { success: false, error: 'No pages available in browser context' };
+      }
 
-      const page: Page = await context.newPage();
-      await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
+      const page = pages[0];
 
       const localStorageData = await page.evaluate(() => {
         const items: Array<{ key: string; value: string }> = [];
@@ -105,9 +100,6 @@ export const storage: ActiveModule = {
         }
       }
 
-      await context.close();
-      await browser.close();
-
       if (localStorageData.length === 0 && sessionStorageData.length === 0) {
         return { success: false, error: 'No storage data found' };
       }
@@ -121,9 +113,6 @@ export const storage: ActiveModule = {
         },
       };
     } catch (error) {
-      if (browser) {
-        await browser.close();
-      }
       return {
         success: false,
         error: `Error: ${error instanceof Error ? error.message : String(error)}`.slice(0, 50),

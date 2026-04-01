@@ -1,3 +1,4 @@
+import type { BrowserContext } from 'playwright';
 import * as Cheerio from 'cheerio';
 
 export interface PassiveModule {
@@ -23,6 +24,9 @@ export interface SharedHtmlData {
   $: Cheerio.CheerioAPI;
   isDynamic: boolean;
   url: string;
+  robotsContent?: string;
+  sitemapUrls?: string[];
+  browserContext?: BrowserContext;
 }
 
 export interface MetadataResult {

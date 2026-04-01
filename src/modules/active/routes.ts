@@ -1,48 +1,8 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import type { ActiveModule, ModuleResult } from '@/types';
+import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
 
 export type RoutesResult = string[];
-
-async function fetchSitemapUrls(sitemapUrl: string, visited: Set<string>): Promise<string[]> {
-  if (visited.has(sitemapUrl)) return [];
-  visited.add(sitemapUrl);
-
-  try {
-    const response = await axios.get(sitemapUrl, {
-      timeout: 10000,
-      validateStatus: () => true,
-    });
-
-    if (response.status !== 200) return [];
-
-    const xml = response.data as string;
-    const $ = cheerio.load(xml, { xmlMode: true });
-    const urls: string[] = [];
-
-    const isIndex = $('sitemap').length > 0;
-
-    if (isIndex) {
-      $('loc').each((_i, el) => {
-        const loc = $(el).text().trim();
-        if (loc) {
-          urls.push(...[...new Set(fetchSitemapUrlsSync(loc, visited))]);
-        }
-      });
-    } else {
-      $('loc').each((_i, el) => {
-        const loc = $(el).text().trim();
-        if (loc && !loc.endsWith('.xml')) {
-          urls.push(loc);
-        }
-      });
-    }
-
-    return urls;
-  } catch {
-    return [];
-  }
-}
 
 async function fetchSitemapUrlsAsync(sitemapUrl: string, visited: Set<string>): Promise<string[]> {
   if (visited.has(sitemapUrl)) return [];
@@ -88,40 +48,50 @@ async function fetchSitemapUrlsAsync(sitemapUrl: string, visited: Set<string>): 
   }
 }
 
-function fetchSitemapUrlsSync(sitemapUrl: string, visited: Set<string>): string[] {
-  if (visited.has(sitemapUrl)) return [];
-  visited.add(sitemapUrl);
-  return [];
-}
-
 export const routes: ActiveModule = {
   name: 'routes',
-  async run(target: string): Promise<ModuleResult<RoutesResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<RoutesResult>> {
     try {
       const hostname = target.replace(/^https?:\/\//, '').split('/')[0];
-      const robotsUrl = `https://${hostname}/robots.txt`;
-
       let sitemapUrls: string[] = [];
 
-      try {
-        const robotsResponse = await axios.get(robotsUrl, {
-          timeout: 10000,
-          validateStatus: () => true,
-        });
+      if (sharedData?.sitemapUrls && sharedData.sitemapUrls.length > 0) {
+        sitemapUrls = [...sharedData.sitemapUrls];
+      }
 
-        if (robotsResponse.status === 200) {
-          const content = robotsResponse.data as string;
-          const lines = content.split('\n');
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith('Sitemap:')) {
-              const url = trimmed.substring(8).trim();
-              if (url) sitemapUrls.push(url);
-            }
+      if (sitemapUrls.length === 0 && sharedData?.robotsContent) {
+        const lines = sharedData.robotsContent.split('\n');
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('Sitemap:')) {
+            const url = trimmed.substring(8).trim();
+            if (url) sitemapUrls.push(url);
           }
         }
-      } catch {
-        // ignore
+      }
+
+      if (sitemapUrls.length === 0) {
+        try {
+          const robotsResponse = await axios.get(`https://${hostname}/robots.txt`, {
+            timeout: 10000,
+            validateStatus: () => true,
+          });
+
+          if (robotsResponse.status === 200) {
+            const content = robotsResponse.data as string;
+            if (sharedData) sharedData.robotsContent = content;
+            const lines = content.split('\n');
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith('Sitemap:')) {
+                const url = trimmed.substring(8).trim();
+                if (url) sitemapUrls.push(url);
+              }
+            }
+          }
+        } catch {
+          // ignore
+        }
       }
 
       if (sitemapUrls.length === 0) {

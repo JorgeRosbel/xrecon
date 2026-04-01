@@ -1,5 +1,6 @@
 import axios from 'axios';
-import type { ActiveModule, ModuleResult } from '@/types';
+import https from 'https';
+import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
 
 export interface RobotsResult {
   url: string;
@@ -10,13 +11,15 @@ export interface RobotsResult {
 
 export const robots: ActiveModule = {
   name: 'robots',
-  async run(target: string): Promise<ModuleResult<RobotsResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<RobotsResult>> {
     try {
       const hostname = target.replace(/^https?:\/\//, '').split('/')[0];
       const url = `https://${hostname}/robots.txt`;
+      const httpsAgent = new https.Agent({ rejectUnauthorized: false });
 
       const response = await axios.get(url, {
         timeout: 10000,
+        httpsAgent,
         validateStatus: () => true,
       });
 
@@ -25,6 +28,11 @@ export const robots: ActiveModule = {
       }
 
       const content = response.data as string;
+
+      if (sharedData) {
+        sharedData.robotsContent = content;
+      }
+
       const lines = content.split('\n');
       const disallowed: string[] = [];
       const allowed: string[] = [];
@@ -40,7 +48,12 @@ export const robots: ActiveModule = {
           if (path) allowed.push(path);
         } else if (trimmed.startsWith('Sitemap:')) {
           const sitemapUrl = trimmed.substring(8).trim();
-          if (sitemapUrl) sitemaps.push(sitemapUrl);
+          if (sitemapUrl) {
+            sitemaps.push(sitemapUrl);
+            if (sharedData) {
+              sharedData.sitemapUrls = [...(sharedData.sitemapUrls || []), sitemapUrl];
+            }
+          }
         }
       }
 

@@ -1,4 +1,5 @@
 import { program } from 'commander';
+import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
 import { getHtml } from '@/utils/get_html';
@@ -11,6 +12,11 @@ function normalizeUrl(input: string): string {
     return `https://${input}`;
   }
   return input;
+}
+
+function needsPlaywright(moduleNames: string[]): boolean {
+  const pwModules = ['cookies', 'storage'];
+  return moduleNames.some(name => pwModules.includes(name));
 }
 
 async function runModules() {
@@ -60,9 +66,28 @@ async function runModules() {
     process.exit(1);
   }
 
+  const activeToRun = runPassiveOnly ? passiveFlags : runHybrid ? activeFlags : selectedActive;
+  const passiveToRun = runPassiveOnly ? passiveFlags : runHybrid ? passiveFlags : selectedPassive;
+
   let sharedHtmlData: SharedHtmlData | undefined;
+  let browser: Browser | null = null;
+  let browserContext: BrowserContext | null = null;
+
   if (runActive) {
     sharedHtmlData = await getHtml(target);
+
+    if (needsPlaywright(activeToRun)) {
+      browser = await chromium.launch({ headless: true });
+      browserContext = await browser.newContext({
+        userAgent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      });
+
+      const page: Page = await browserContext.newPage();
+      await page.goto(sharedHtmlData.url, { waitUntil: 'networkidle', timeout: 30000 });
+
+      sharedHtmlData.browserContext = browserContext;
+    }
   }
 
   const results: Partial<Results> = {};
@@ -74,6 +99,12 @@ async function runModules() {
         try {
           const result = await mod.run(target);
           (results as Record<string, unknown>)[moduleName] = result;
+          if (moduleName === 'robots' && result.success && result.data) {
+            const data = result.data as { sitemaps?: string[] };
+            if (data.sitemaps && sharedHtmlData) {
+              sharedHtmlData.sitemapUrls = data.sitemaps;
+            }
+          }
         } catch (error) {
           (results as Record<string, unknown>)[moduleName] = {
             success: false,
@@ -102,13 +133,20 @@ async function runModules() {
   };
 
   if (runPassiveOnly) {
-    await runPassiveModules(passiveFlags);
+    await runPassiveModules(passiveToRun);
   } else if (runHybrid) {
-    await runPassiveModules(passiveFlags);
-    await runActiveModules(activeFlags);
+    await runPassiveModules(passiveToRun);
+    await runActiveModules(activeToRun);
   } else if (hasSpecificFlags) {
-    await runPassiveModules(selectedPassive);
-    await runActiveModules(selectedActive);
+    await runPassiveModules(passiveToRun);
+    await runActiveModules(activeToRun);
+  }
+
+  if (browserContext) {
+    await browserContext.close();
+  }
+  if (browser) {
+    await browser.close();
   }
 
   const output: ScanOutput = { target, results: results as Results };
