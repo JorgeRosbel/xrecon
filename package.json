@@ -4,7 +4,7 @@
   "type": "module",
   "description": "OSINT CLI tool for web reconnaissance - gather passive and active information about websites.",
   "bin": {
-    "xrecon": "dist/index.mjs"
+    "xrecon": "dist/index.cjs"
   },
   "repository": {
     "type": "git",
@@ -51,6 +51,7 @@
   "packageManager": "pnpm@10.18.1",
   "devDependencies": {
     "@esbuild-plugins/tsconfig-paths": "^0.1.2",
+    "@playwright/test": "^1.58.2",
     "@types/inquirer": "^9.0.8",
     "@types/node": "^24.0.15",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
@@ -59,6 +60,7 @@
     "eslint": "^10.1.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
+    "playwright": "^1.58.2",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "tsdown": "^0.21.5",
@@ -68,8 +70,10 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "axios": "1.13.6",
     "boxen": "^8.0.1",
     "chalk": "^5.4.1",
+    "cheerio": "1.1.2",
     "commander": "^12.1.0",
     "inquirer": "^12.7.0",
     "ora": "^9.0.0",
