@@ -2,6 +2,7 @@ import dns from 'dns';
 import { promisify } from 'util';
 import { program } from 'commander';
 import fs from 'fs/promises';
+import chalk from 'chalk';
 
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
@@ -11,6 +12,7 @@ import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
 import { getHtml } from '@/utils/get_html';
 import { generateHtmlOutput } from '@/utils/output-html';
+import { formatCliOutput } from '@/utils/output-cli';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
 const VERSION = '0.0.1';
@@ -185,29 +187,29 @@ async function runModules() {
   }
 
   const output: ScanOutput = { target, results: results as Results };
-  console.log(JSON.stringify(output, null, 2));
+  formatCliOutput(target, results as Results);
 
+  const jsonOutput = JSON.stringify(output, null, 2);
   const outputJson = opts.outputJson;
   const outputHtml = opts.outputHtml;
   const outputText = opts.output;
 
   if (outputJson) {
     const jsonFilename = typeof outputJson === 'string' ? outputJson : 'output.json';
-    await fs.writeFile(jsonFilename, JSON.stringify(output, null, 2), 'utf-8');
-    console.error(`JSON output saved to: ${jsonFilename}`);
+    await fs.writeFile(jsonFilename, jsonOutput, 'utf-8');
+    console.error(chalk.green(`✓ JSON output saved to: ${jsonFilename}`));
   }
 
   if (outputHtml) {
     const htmlFilename = typeof outputHtml === 'string' ? outputHtml : 'output.html';
     const htmlContent = generateHtmlOutput(output);
     await fs.writeFile(htmlFilename, htmlContent, 'utf-8');
-    console.error(`HTML output saved to: ${htmlFilename}`);
+    console.error(chalk.green(`✓ HTML output saved to: ${htmlFilename}`));
   }
 
   if (outputText) {
-    const textContent = JSON.stringify(output, null, 2);
-    await fs.writeFile(outputText, textContent, 'utf-8');
-    console.error(`Output saved to: ${outputText}`);
+    await fs.writeFile(outputText, jsonOutput, 'utf-8');
+    console.error(chalk.green(`✓ Output saved to: ${outputText}`));
   }
 }
 
