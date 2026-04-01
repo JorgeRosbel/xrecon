@@ -1,8 +1,13 @@
 import axios from 'axios';
+import dns from 'dns';
+import { promisify } from 'util';
 import type { PassiveModule, ModuleResult } from '@/types';
+
+const resolve4 = promisify(dns.resolve4);
 
 export interface WhoisResult {
   domain_name: string;
+  edge_ip: string;
   nameservers: string[];
   registrar: string;
   creation_date: string;
@@ -59,10 +64,19 @@ export const whois: PassiveModule = {
         const entities = (data.entities as Array<Record<string, unknown>>) || [];
         const registrar = (entities[0]?.links as Array<Record<string, string>>)?.[0]?.href || 'N/A';
 
+        let edgeIp = 'N/A';
+        try {
+          const ips = await resolve4(domain);
+          edgeIp = ips[0] || 'N/A';
+        } catch {
+          edgeIp = 'Could not resolve';
+        }
+
         return {
           success: true,
           data: {
             domain_name: (data.ldhName as string) || 'N/A',
+            edge_ip: edgeIp,
             nameservers,
             registrar,
             creation_date: creationHuman,

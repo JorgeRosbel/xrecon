@@ -94,6 +94,7 @@ export interface SitemapResult {
 
 export interface WhoisResult {
   domain_name: string;
+  edge_ip: string;
   nameservers: string[];
   registrar: string;
   creation_date: string;
