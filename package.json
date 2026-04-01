@@ -1,11 +1,33 @@
 {
-  "name": "xrecon",
+  "name": "@jorge-rosbel/xrecon",
   "version": "0.0.1",
   "type": "module",
   "description": "OSINT CLI tool for web reconnaissance - gather passive and active information about websites.",
   "bin": {
     "xrecon": "dist/index.mjs"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JorgeRosbel/xrecon.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JorgeRosbel/xrecon/issues"
+  },
+  "homepage": "https://github.com/JorgeRosbel/xrecon#readme",
+  "keywords": [
+    "osint",
+    "reconnaissance",
+    "security",
+    "web",
+    "cli",
+    "pentest"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsdown",
     "dev": "tsdown --watch",
@@ -24,7 +46,6 @@
   "lint-staged:options": {
     "allowEmpty": true
   },
-  "keywords": [],
   "author": "Jorge Rosbel",
   "license": "MIT",
   "packageManager": "pnpm@10.18.1",
