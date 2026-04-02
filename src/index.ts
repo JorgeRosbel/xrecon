@@ -35,7 +35,7 @@ import { generateHtmlOutput } from '@/utils/output-html';
 import { formatCliOutput, formatCliOutputPlain } from '@/utils/output-cli';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
-const VERSION = '0.0.5';
+const VERSION = '0.0.6';
 
 function normalizeUrl(input: string): string {
   if (!input.startsWith('http://') && !input.startsWith('https://')) {

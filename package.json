@@ -1,6 +1,6 @@
 {
   "name": "@ariaskit/xrecon",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "type": "module",
   "description": "OSINT CLI tool for web reconnaissance - gather passive and active information about websites.",
   "bin": {
