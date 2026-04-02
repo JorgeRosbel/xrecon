@@ -89,7 +89,6 @@ const TECH_PATTERNS: TechPattern[] = [
       /data-reactroot/g,
       /react\.production/g,
       /react\.development/g,
-      /createElement\(/g,
     ],
     versionPattern: /react(?:-dom)?[.@\/](\d+\.\d+\.\d+)/gi,
   },
@@ -106,13 +105,13 @@ const TECH_PATTERNS: TechPattern[] = [
   {
     name: 'Angular',
     category: 'JavaScript Framework',
-    patterns: [/ng-version=/g, /ng-[a-z-]+/g, /@angular\/core/g, /angular\.min\.js/g],
+    patterns: [/ng-version=/g, /@angular\/core/g, /angular\.min\.js/g],
     versionPattern: /ng-version="(\d+\.\d+\.\d+)"/g,
   },
   {
     name: 'Svelte',
     category: 'JavaScript Framework',
-    patterns: [/svelte/g, /__svelte/g, /svelte\.internal/g, /svelte\/src/g],
+    patterns: [/svelte(?:\.min)?\.js/g, /svelte\.internal/g, /svelte\/compiler/g],
   },
   {
     name: 'Solid.js',
@@ -167,7 +166,7 @@ const TECH_PATTERNS: TechPattern[] = [
   {
     name: 'Lit',
     category: 'JavaScript Framework',
-    patterns: [/lit-element/g, /lit-html/g, /@lit\/reactive-element/g],
+    patterns: [/lit-element\.min\.js/g, /lit-html\.min\.js/g, /@lit\/reactive-element/g],
   },
 
   // ── JavaScript Libraries ──
@@ -238,21 +237,16 @@ const TECH_PATTERNS: TechPattern[] = [
     name: 'Tailwind CSS',
     category: 'UI Framework',
     patterns: [
-      /class="[^"]*\b(?:text-|bg-|border-|flex-|grid-|space-|divide-|ring-|shadow-|rounded-|px-|py-|mx-|my-|w-|h-|max-|min-|overflow-|opacity-|transition-|duration-|ease-|delay-|transform|scale-|rotate-|translate-|skew-|origin-|animate-|cursor-|select-|resize-|appearance-|placeholder-|caret-|accent-|fill-|stroke-|scroll-|snap-|aspect-|object-|inset-|z-|order-|col-|row-|gap-|justify-|items-|content-|self-|place-|align-)(?:\w|-)*\b/g,
-      /tailwindcss/g,
-      /tailwind\.css/g,
+      /tailwindcss\.com/g,
+      /cdn\.tailwindcss\.com/g,
+      /tailwind\.css\?v=/g,
+      /tailwind\.output\.css/g,
     ],
   },
   {
     name: 'Bootstrap',
     category: 'UI Framework',
-    patterns: [
-      /bootstrap/g,
-      /bootstrap\.min\.css/g,
-      /bootstrap\.bundle/g,
-      /btn-primary/g,
-      /navbar-toggler/g,
-    ],
+    patterns: [/bootstrap\/(?:css|js)@/g, /bootstrap\.min\.(css|js)/g, /bootstrap\.bundle\.js/g],
     versionPattern: /bootstrap[.@\/](\d+\.\d+\.\d+)/gi,
   },
   {
