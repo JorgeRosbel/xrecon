@@ -72,6 +72,8 @@ xrecon example.com -H -oN results.json
 | `-s, --ssl`      | ssl      | SSL certificate info                               |
 | `-O, --os`       | os       | OS detection via TTL                               |
 | `-i, --metadata` | metadata | Page title and meta description                    |
+| `-C, --comments` | comments | Extract HTML comments                              |
+| `-J, --scripts`  | scripts  | Extract JavaScript file URLs                       |
 | `-e, --emails`   | emails   | Extract emails                                     |
 | `-p, --phones`   | phones   | Extract phone numbers                              |
 | `-M, --sitemap`  | sitemap  | Sitemap URLs                                       |
@@ -132,11 +134,26 @@ xrecon example.com -H -oJ scan.json
 ### Save results as HTML
 
 ```bash
-xrecon example.com -H -oH
-# Saves to output.html
-
 xrecon example.com -H -oH report.html
 # Saves to report.html
+```
+
+### Extract HTML comments
+
+```bash
+xrecon example.com -C
+```
+
+### Extract JavaScript URLs
+
+```bash
+xrecon example.com -J
+```
+
+### Tech detection with WordPress plugins
+
+```bash
+xrecon example.com -T -W
 ```
 
 ## Requirements
