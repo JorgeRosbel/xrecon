@@ -3,6 +3,7 @@ import { promisify } from 'util';
 import { program } from 'commander';
 import fs from 'fs/promises';
 import chalk from 'chalk';
+import ora from 'ora';
 
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
@@ -100,10 +101,12 @@ async function runModules() {
   let sharedHtmlData: SharedHtmlData | undefined;
   let browser: Browser | null = null;
   let browserContext: BrowserContext | null = null;
+  const fetchSpinner = ora({ text: 'Fetching page...', prefixText: '  ' }).start();
 
   if (runActive) {
     try {
       sharedHtmlData = await getHtml(target);
+      fetchSpinner.succeed('Page fetched');
 
       if (needsPlaywright(activeToRun)) {
         browser = await chromium.launch({ headless: true });
@@ -118,22 +121,31 @@ async function runModules() {
         sharedHtmlData.browserContext = browserContext;
       }
     } catch (error) {
+      fetchSpinner.fail('Failed to fetch page');
       console.error(
         `Warning: Could not fetch page data: ${error instanceof Error ? error.message : String(error)}`
       );
       sharedHtmlData = undefined;
     }
+  } else {
+    fetchSpinner.stop();
   }
 
   const results: Partial<Results> = {};
 
   const runPassiveModules = async (moduleNames: string[]) => {
-    const promises = moduleNames.map(async moduleName => {
+    const spinners = moduleNames.map(moduleName => {
+      const spinner = ora({ text: moduleName, prefixText: '  ' }).start();
+      return { moduleName, spinner };
+    });
+
+    const promises = spinners.map(async ({ moduleName, spinner }) => {
       const mod = passiveModules[moduleName as keyof typeof passiveModules];
       if (mod?.run) {
         try {
           const result = await mod.run(target);
           (results as Record<string, unknown>)[moduleName] = result;
+          spinner.succeed();
           if (moduleName === 'robots' && result.success && result.data) {
             const data = result.data as { sitemaps?: string[] };
             if (data.sitemaps && sharedHtmlData) {
@@ -145,6 +157,7 @@ async function runModules() {
             success: false,
             error: String(error),
           };
+          spinner.fail();
         }
       }
     });
@@ -152,17 +165,24 @@ async function runModules() {
   };
 
   const runActiveModules = async (moduleNames: string[]) => {
-    const promises = moduleNames.map(async moduleName => {
+    const spinners = moduleNames.map(moduleName => {
+      const spinner = ora({ text: moduleName, prefixText: '  ' }).start();
+      return { moduleName, spinner };
+    });
+
+    const promises = spinners.map(async ({ moduleName, spinner }) => {
       const mod = activeModules[moduleName as keyof typeof activeModules];
       if (mod?.run) {
         try {
           const result = await mod.run(target, sharedHtmlData);
           (results as Record<string, unknown>)[moduleName] = result;
+          spinner.succeed();
         } catch (error) {
           (results as Record<string, unknown>)[moduleName] = {
             success: false,
             error: String(error),
           };
+          spinner.fail();
         }
       }
     });
