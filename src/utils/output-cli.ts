@@ -60,7 +60,9 @@ function formatValuePlain(key: string, value: unknown): string {
         '\n' +
         value
           .map((item, i) => {
-            const entries = Object.entries(item as Record<string, unknown>);
+            const entries = Object.entries(item as Record<string, unknown>).filter(
+              ([, v]) => v !== undefined && v !== null
+            );
             const itemLines = entries.map(([k, v]) => `    ${k}: ${formatValuePlain(k, v)}`);
             return i === 0 ? itemLines.join('\n') : '\n' + itemLines.join('\n');
           })
@@ -103,7 +105,9 @@ function formatValue(key: string, value: unknown): string {
         '\n' +
         value
           .map((item, i) => {
-            const entries = Object.entries(item as Record<string, unknown>);
+            const entries = Object.entries(item as Record<string, unknown>).filter(
+              ([, v]) => v !== undefined && v !== null
+            );
             const itemLines = entries.map(([k, v]) => `    ${chalk.cyan(k)}: ${formatValue(k, v)}`);
             return i === 0 ? itemLines.join('\n') : '\n' + itemLines.join('\n');
           })
@@ -138,7 +142,9 @@ function formatModuleDataPlain(moduleName: string, result: ModuleResult): string
     }
     if (typeof data[0] === 'object') {
       data.forEach((item, idx) => {
-        const entries = Object.entries(item as Record<string, unknown>);
+        const entries = Object.entries(item as Record<string, unknown>).filter(
+          ([, v]) => v !== undefined && v !== null
+        );
         entries.forEach(([k, v]) => {
           lines.push(`  ${k}: ${formatValuePlain(k, v)}`);
         });
@@ -177,7 +183,9 @@ function formatModuleData(moduleName: string, result: ModuleResult): string {
     }
     if (typeof data[0] === 'object') {
       data.forEach((item, idx) => {
-        const entries = Object.entries(item as Record<string, unknown>);
+        const entries = Object.entries(item as Record<string, unknown>).filter(
+          ([, v]) => v !== undefined && v !== null
+        );
         entries.forEach(([k, v]) => {
           lines.push(`  ${chalk.cyan(k)}: ${formatValue(k, v)}`);
         });
