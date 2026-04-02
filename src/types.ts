@@ -146,6 +146,17 @@ export interface CookieResult {
 
 export type RoutesResult = string[];
 
+export interface JSSecretsFinding {
+  type: string;
+  name: string;
+  value: string;
+  file: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+}
+
+export type JSSecretsResult = JSSecretsFinding[];
+
 export interface Results {
   whois?: ModuleResult<WhoisResult>;
   mx?: ModuleResult<MxResult[]>;
@@ -169,6 +180,7 @@ export interface Results {
   routes?: ModuleResult<RoutesResult>;
   cookies?: ModuleResult<CookieResult[]>;
   storage?: ModuleResult<StorageResult>;
+  jssecrets?: ModuleResult<JSSecretsResult>;
 }
 
 export interface ScanOutput {

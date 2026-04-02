@@ -31,6 +31,7 @@ const MODULE_TYPES: Record<string, 'passive' | 'active'> = {
   routes: 'active',
   cookies: 'active',
   storage: 'active',
+  jssecrets: 'active',
 };
 
 function formatValuePlain(key: string, value: unknown): string {

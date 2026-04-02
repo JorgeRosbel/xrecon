@@ -95,25 +95,26 @@ xrecon search email
 
 ### Active Modules
 
-| Flag             | Module   | Description                                        |
-| ---------------- | -------- | -------------------------------------------------- |
-| `-h, --headers`  | headers  | HTTP headers                                       |
-| `-c, --security` | security | Security headers                                   |
-| `-T, --tech`     | tech     | Detect technologies                                |
-| `-W, --wplugins` | wplugins | WordPress plugins                                  |
-| `-s, --ssl`      | ssl      | SSL certificate info                               |
-| `-O, --os`       | os       | OS detection via TTL                               |
-| `-i, --metadata` | metadata | Page title and meta description                    |
-| `-C, --comments` | comments | Extract HTML comments                              |
-| `-J, --scripts`  | scripts  | Extract JavaScript file URLs                       |
-| `-e, --emails`   | emails   | Extract emails                                     |
-| `-p, --phones`   | phones   | Extract phone numbers                              |
-| `-M, --sitemap`  | sitemap  | Sitemap URLs                                       |
-| `-r, --robots`   | robots   | Robots.txt                                         |
-| `-l, --social`   | social   | Social networks                                    |
-| `-R, --routes`   | routes   | Public routes from sitemaps                        |
-| `-k, --cookies`  | cookies  | Detect cookies                                     |
-| `-K, --storage`  | storage  | Extract localStorage/sessionStorage and JWT tokens |
+| Flag              | Module    | Description                                        |
+| ----------------- | --------- | -------------------------------------------------- |
+| `-h, --headers`   | headers   | HTTP headers                                       |
+| `-c, --security`  | security  | Security headers                                   |
+| `-T, --tech`      | tech      | Detect technologies                                |
+| `-W, --wplugins`  | wplugins  | WordPress plugins                                  |
+| `-s, --ssl`       | ssl       | SSL certificate info                               |
+| `-O, --os`        | os        | OS detection via TTL                               |
+| `-i, --metadata`  | metadata  | Page title and meta description                    |
+| `-C, --comments`  | comments  | Extract HTML comments                              |
+| `-J, --scripts`   | scripts   | Extract JavaScript file URLs                       |
+| `-e, --emails`    | emails    | Extract emails                                     |
+| `-p, --phones`    | phones    | Extract phone numbers                              |
+| `-M, --sitemap`   | sitemap   | Sitemap URLs                                       |
+| `-r, --robots`    | robots    | Robots.txt                                         |
+| `-l, --social`    | social    | Social networks                                    |
+| `-R, --routes`    | routes    | Public routes from sitemaps                        |
+| `-k, --cookies`   | cookies   | Detect cookies                                     |
+| `-K, --storage`   | storage   | Extract localStorage/sessionStorage and JWT tokens |
+| `-X, --jssecrets` | jssecrets | Scan JS files for secrets and sensitive data       |
 
 ## Examples
 
@@ -183,6 +184,12 @@ xrecon example.com -C
 
 ```bash
 xrecon example.com -J
+```
+
+### Scan JS files for secrets
+
+```bash
+xrecon example.com -X
 ```
 
 ### Tech detection with WordPress plugins

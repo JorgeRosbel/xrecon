@@ -97,6 +97,7 @@ async function runModules() {
     'routes',
     'cookies',
     'storage',
+    'jssecrets',
   ];
 
   const selectedPassive = passiveFlags.filter(flag => opts[flag]);
@@ -273,7 +274,8 @@ program
   .option('-l, --social', 'Social networks [ACTIVE]')
   .option('-R, --routes', 'Public routes from all sitemaps [ACTIVE]')
   .option('-k, --cookies', 'Detect cookies [ACTIVE]')
-  .option('-K, --storage', 'Extract localStorage/sessionStorage and JWT tokens [ACTIVE]');
+  .option('-K, --storage', 'Extract localStorage/sessionStorage and JWT tokens [ACTIVE]')
+  .option('-X, --jssecrets', 'Scan JS files for secrets and sensitive data [ACTIVE]');
 
 program.parse(process.argv);
 
