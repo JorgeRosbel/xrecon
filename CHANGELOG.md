@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.7 - April 2, 2026
+
+### fix: improve tech detection specificity to reduce false positives
+
+- Removed overly generic patterns that caused false positives: React (createElement), Angular (ng-\* attributes), Bootstrap (btn-primary classes), Tailwind (utility classes)
+- Made detection more strict to only match explicit CDN URLs and library-specific indicators
+- Fixed false detection of React, Angular, Bootstrap, Tailwind CSS on Astro sites and other frameworks
+
 ## v0.0.6 - April 2, 2026
 
 ### feat: enhance tech detection module with 80+ patterns and version extraction
