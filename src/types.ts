@@ -27,6 +27,7 @@ export interface SharedHtmlData {
   robotsContent?: string;
   sitemapUrls?: string[];
   browserContext?: BrowserContext;
+  scripts?: string[];
 }
 
 export interface MetadataResult {
@@ -158,6 +159,18 @@ export interface JSSecretsFinding {
 
 export type JSSecretsResult = JSSecretsFinding[];
 
+export interface Endpoint {
+  path: string;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'UNKNOWN';
+  source: 'js' | 'form';
+  file?: string;
+  baseUrl?: string;
+  fullUrl?: string;
+  dataType?: 'json' | 'form' | 'unknown';
+}
+
+export type EndpointsResult = Endpoint[];
+
 export interface Results {
   whois?: ModuleResult<WhoisResult>;
   mx?: ModuleResult<MxResult[]>;
@@ -182,6 +195,7 @@ export interface Results {
   cookies?: ModuleResult<CookieResult[]>;
   storage?: ModuleResult<StorageResult>;
   jssecrets?: ModuleResult<JSSecretsResult>;
+  endpoints?: ModuleResult<EndpointsResult>;
 }
 
 export interface ScanOutput {

@@ -32,6 +32,7 @@ const MODULE_TYPES: Record<string, 'passive' | 'active'> = {
   cookies: 'active',
   storage: 'active',
   jssecrets: 'active',
+  endpoints: 'active',
 };
 
 function formatValuePlain(key: string, value: unknown): string {
@@ -76,6 +77,25 @@ function formatValuePlain(key: string, value: unknown): string {
 
       return '\n' + lines.join('\n');
     }
+
+    if (key === 'endpoints' && Array.isArray(value)) {
+      const endpointsData = value as Array<{
+        url: string;
+        method: string;
+        source: string;
+        file?: string;
+      }>;
+      const lines: string[] = [];
+
+      endpointsData.forEach(ep => {
+        const methodStr = ep.method;
+        const fileInfo = ep.file ? ` (${ep.file})` : ep.source === 'form' ? ' [form]' : '';
+        lines.push(`  ${methodStr} ${ep.url}${fileInfo}`);
+      });
+
+      return '\n' + lines.join('\n');
+    }
+
     if (typeof value[0] === 'object' && value[0] !== null) {
       return (
         '\n' +
@@ -144,6 +164,87 @@ function formatValue(key: string, value: unknown): string {
 
       return '\n' + lines.join('\n');
     }
+
+    if (key === 'endpoints' && Array.isArray(value)) {
+      const endpointsData = value as Array<{
+        path: string;
+        method: string;
+        source: string;
+        file?: string;
+        baseUrl?: string;
+        fullUrl?: string;
+        dataType?: string;
+      }>;
+      const lines: string[] = [];
+
+      endpointsData.forEach(ep => {
+        const methodColor =
+          ep.method === 'GET'
+            ? chalk.blue('GET')
+            : ep.method === 'POST'
+              ? chalk.green('POST')
+              : ep.method === 'PUT'
+                ? chalk.yellow('PUT')
+                : ep.method === 'DELETE'
+                  ? chalk.red('DELETE')
+                  : ep.method === 'PATCH'
+                    ? chalk.magenta('PATCH')
+                    : chalk.gray(ep.method);
+
+        let endpointInfo = `${methodColor} ${ep.path}`;
+        if (ep.file) endpointInfo += ` (${ep.file})`;
+        else if (ep.source === 'form') endpointInfo += ' [form]';
+
+        lines.push(`  ${endpointInfo}`);
+
+        if (ep.baseUrl) {
+          lines.push(`    baseUrl: ${ep.baseUrl}`);
+        }
+        if (ep.fullUrl) {
+          lines.push(`    fullUrl: ${ep.fullUrl}`);
+        }
+        if (ep.dataType && ep.dataType !== 'unknown') {
+          lines.push(`    dataType: ${ep.dataType}`);
+        }
+      });
+
+      return '\n' + lines.join('\n');
+    }
+
+    if (key === 'endpoints' && Array.isArray(value)) {
+      const endpointsData = value as Array<{
+        path: string;
+        method: string;
+        source: string;
+        file?: string;
+        baseUrl?: string;
+        fullUrl?: string;
+        dataType?: string;
+      }>;
+      const lines: string[] = [];
+
+      endpointsData.forEach(ep => {
+        const methodStr = ep.method;
+        let endpointInfo = `${methodStr} ${ep.path}`;
+        if (ep.file) endpointInfo += ` (${ep.file})`;
+        else if (ep.source === 'form') endpointInfo += ' [form]';
+
+        lines.push(`  ${endpointInfo}`);
+
+        if (ep.baseUrl) {
+          lines.push(`    baseUrl: ${ep.baseUrl}`);
+        }
+        if (ep.fullUrl) {
+          lines.push(`    fullUrl: ${ep.fullUrl}`);
+        }
+        if (ep.dataType && ep.dataType !== 'unknown') {
+          lines.push(`    dataType: ${ep.dataType}`);
+        }
+      });
+
+      return '\n' + lines.join('\n');
+    }
+
     if (typeof value[0] === 'object' && value[0] !== null) {
       return (
         '\n' +

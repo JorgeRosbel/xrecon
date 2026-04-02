@@ -35,7 +35,7 @@ import { generateHtmlOutput } from '@/utils/output-html';
 import { formatCliOutput, formatCliOutputPlain } from '@/utils/output-cli';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
-const VERSION = '0.0.9';
+const VERSION = '0.1.0';
 
 function normalizeUrl(input: string): string {
   if (!input.startsWith('http://') && !input.startsWith('https://')) {
@@ -98,6 +98,7 @@ async function runModules() {
     'cookies',
     'storage',
     'jssecrets',
+    'endpoints',
   ];
 
   const selectedPassive = passiveFlags.filter(flag => opts[flag]);
@@ -275,7 +276,8 @@ program
   .option('-R, --routes', 'Public routes from all sitemaps [ACTIVE]')
   .option('-k, --cookies', 'Detect cookies [ACTIVE]')
   .option('-K, --storage', 'Extract localStorage/sessionStorage and JWT tokens [ACTIVE]')
-  .option('-X, --jssecrets', 'Scan JS files for secrets and sensitive data [ACTIVE]');
+  .option('-X, --jssecrets', 'Scan JS files for secrets and sensitive data [ACTIVE]')
+  .option('-E, --endpoints', 'Extract API endpoints from JS files and forms [ACTIVE]');
 
 program.parse(process.argv);
 

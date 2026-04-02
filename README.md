@@ -157,6 +157,7 @@ xrecon list
 | `-k, --cookies`   | cookies   | Detect cookies                                     |
 | `-K, --storage`   | storage   | Extract localStorage/sessionStorage and JWT tokens |
 | `-X, --jssecrets` | jssecrets | Scan JS files for secrets and sensitive data       |
+| `-E, --endpoints` | endpoints | Extract API endpoints from JS files and forms      |
 
 ## Examples
 

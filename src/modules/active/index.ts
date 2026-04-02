@@ -16,3 +16,4 @@ export { routes } from './routes';
 export { cookies } from './cookies';
 export { storage } from './storage';
 export { jssecrets } from './jssecrets';
+export { endpoints } from './endpoints';

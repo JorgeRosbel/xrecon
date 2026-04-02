@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.1.0 - April 2, 2026
+
+### feat: add endpoints module to extract API endpoints from JS files and forms
+
+- New module that scans JavaScript files for API endpoint patterns
+- Detects endpoints from: fetch(), axios.\*(), $.ajax(), $.get/post, xhr.open, XMLHttpRequest
+- Extracts form action and method from HTML
+- Detects base URLs from axios.create({ baseURL: '...' })
+- Detects subdomains that might be API base URLs
+- Detects data type (json/form) from Content-Type headers and JSON.stringify/.json() usage
+- Returns structured data: path, fullUrl, baseUrl, method, source, file, dataType
+- Handles minified JavaScript code
+
+### fix: release workflow for GitHub releases
+
+- Added release.yml workflow to create GitHub releases on tag push
+
 ## v0.0.8 - April 2, 2026
 
 ### feat: enhance sitemap module to discover all URLs recursively from sitemap indexes
