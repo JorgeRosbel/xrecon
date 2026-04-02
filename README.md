@@ -2,6 +2,14 @@
 
 OSINT CLI tool for web reconnaissance - gather passive and active information about websites.
 
+xrecon uses two types of reconnaissance modules to provide a comprehensive view of any target:
+
+**Passive modules** gather information from public sources and third-party APIs without directly interacting with the target. These modules query DNS records, RDAP databases, and other public data sources, making them fast and stealthy.
+
+**Active modules** interact directly with the target website by making HTTP requests, analyzing HTML content, and in some cases using a headless browser. These modules can detect technologies, extract metadata, scan for secrets in JavaScript files, analyze security headers, and much more.
+
+Run modules individually with specific flags, or use `-H` for a full hybrid scan that combines both approaches.
+
 ![xrecon screenshot](.github/189_1x_shots_so.png)
 
 ## Installation
