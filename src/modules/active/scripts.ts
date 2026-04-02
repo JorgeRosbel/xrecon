@@ -6,14 +6,22 @@ export const scripts: ActiveModule = {
   name: 'scripts',
   async run(_target: string, sharedData: SharedHtmlData): Promise<ModuleResult<ScriptsResult>> {
     try {
-      const { $ } = sharedData;
+      const { $, url } = sharedData;
+      const baseUrl = new URL(url);
 
       const found: string[] = [];
 
       $('script[src]').each((_i, el) => {
-        const src = $(el).attr('src');
-        if (src && !found.includes(src)) {
+        let src = $(el).attr('src');
+        if (!src || found.includes(src)) return;
+
+        if (src.startsWith('http://') || src.startsWith('https://')) {
           found.push(src);
+        } else if (src.startsWith('//')) {
+          found.push(`https:${src}`);
+        } else {
+          const absoluteUrl = new URL(src, baseUrl.origin).href;
+          found.push(absoluteUrl);
         }
       });
 
