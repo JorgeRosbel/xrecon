@@ -3,5 +3,6 @@ packages:
 
 ignoredBuiltDependencies:
   - esbuild
+  - playwright-chromium
 
 minimumReleaseAge: 10080

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { chromium, type Browser, type Page } from 'playwright';
+import { chromium, type Browser, type Page } from 'playwright-chromium';
 import https from 'https';
 import type { SharedHtmlData } from '@/types';
 

@@ -27,7 +27,7 @@ if (isSearchOrList) {
   process.exit(0);
 }
 
-import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
+import { chromium, type Browser, type BrowserContext, type Page } from 'playwright-chromium';
 import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
 import { getHtml } from '@/utils/get_html';
@@ -35,7 +35,7 @@ import { generateHtmlOutput } from '@/utils/output-html';
 import { formatCliOutput, formatCliOutputPlain } from '@/utils/output-cli';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
-const VERSION = '0.0.3';
+const VERSION = '0.0.4';
 
 function normalizeUrl(input: string): string {
   if (!input.startsWith('http://') && !input.startsWith('https://')) {
