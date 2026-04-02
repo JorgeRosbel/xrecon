@@ -1,8 +1,8 @@
 ---
-description: Bump patch version, commit changes, and push to remote
+description: Bump patch version, generate changelog, commit changes, and push to remote
 ---
 
-Automated deploy workflow that bumps the patch version and commits changes.
+Automated deploy workflow that generates a changelog, bumps the patch version, and commits changes.
 
 ## Workflow
 
@@ -10,26 +10,68 @@ Automated deploy workflow that bumps the patch version and commits changes.
 
 Extract the current version from package.json.
 
-### Step 2: Bump Patch Version
+### Step 2: Analyze Uncommitted Changes
+
+```bash
+git diff --staged | grep -E '^\+|^\-' | head -30
+git diff | grep -E '^\+|^\-' | head -30
+```
+
+Review all staged and unstaged changes to understand what will be included in this release.
+
+### Step 3: Generate CHANGELOG.md
+
+Create or update `CHANGELOG.md` at the project root. If the file exists, prepend the new entry. If it doesn't exist, create it.
+
+Use this format:
+
+```markdown
+# Changelog
+
+## v<NEW_VERSION> - <DATE>
+
+### <Type>: <Description>
+
+- <bullet point describing change>
+- <bullet point describing change>
+```
+
+**Date format:** Human-readable English, e.g., `April 2, 2026`
+
+**Example:**
+
+```markdown
+# Changelog
+
+## v0.0.6 - April 2, 2026
+
+### fix: make playwright non-fatal for dynamic sites
+
+- Playwright failures no longer crash the entire scan
+- Added helpful warning message when dynamic content is unavailable
+- Fallback to static HTML when Playwright is not installed
+
+## v0.0.5 - March 30, 2026
+
+### fix: add sharedData fallback in active modules
+
+- metadata, scripts, comments, social, phones, emails now fetch their own HTML if sharedData is unavailable
+```
+
+### Step 4: Bump Patch Version
 
 Increment the patch version (e.g., 0.0.5 → 0.0.6) in:
 
 - `package.json` (version field)
 - `src/index.ts` (VERSION constant)
 
-### Step 3: Stage All Changes
+### Step 5: Stage All Changes
 
 ```bash
 git add .
 ```
 
-### Step 4: Analyze Changes
-
-```bash
-git diff --staged | grep -E '^\+|^\-' | head -30
-```
-
-### Step 5: Generate Commit Message
+### Step 6: Generate Commit Message
 
 Based on analyzed changes, determine type:
 
@@ -44,13 +86,13 @@ Based on analyzed changes, determine type:
 | `test` / spec files                  | test                | `:white_check_mark:` |
 | `ci` / github actions                | ci                  | `:green_heart:`      |
 
-### Step 6: Create Commit
+### Step 7: Create Commit
 
 ```bash
 git commit -m ":rocket: <type>: <description> (v<new-version>)"
 ```
 
-### Step 7: Push to Remote
+### Step 8: Push to Remote
 
 ```bash
 git branch --show-current | xargs -I {} git push -u origin {}
@@ -72,6 +114,7 @@ Always push to the current branch (never hardcode branch name).
 - First letter lowercase
 - Include affected feature/module name
 - Include new version number in parentheses
+- CHANGELOG.md date must be in human-readable English format
 
 ## Examples
 
