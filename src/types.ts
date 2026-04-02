@@ -93,7 +93,9 @@ export interface OSResult {
 }
 
 export interface SitemapResult {
-  url: string;
+  sitemapIndexes: string[];
+  sitemaps: string[];
+  urls: string[];
 }
 
 export interface WhoisResult {
