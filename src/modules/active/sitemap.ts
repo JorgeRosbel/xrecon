@@ -5,7 +5,6 @@ import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
 export interface SitemapResult {
   sitemapIndexes: string[];
   sitemaps: string[];
-  urls: string[];
 }
 
 async function fetchAndParseSitemap(url: string): Promise<{
@@ -39,10 +38,8 @@ async function fetchAndParseSitemap(url: string): Promise<{
       const loc = $(el).text().trim();
       if (!loc) return;
 
-      if (loc.includes('sitemap.xml') || loc.endsWith('.xml')) {
+      if (loc.toLowerCase().includes('sitemap')) {
         childSitemaps.push(loc);
-      } else {
-        urls.push(loc);
       }
     });
 
@@ -57,7 +54,6 @@ async function fetchAndParseSitemap(url: string): Promise<{
 async function discoverSitemaps(
   initialUrls: string[],
   visited: Set<string>,
-  allUrls: string[],
   allSitemaps: string[],
   allIndexes: string[],
   depth: number = 0
@@ -73,22 +69,10 @@ async function discoverSitemaps(
     if (result.isIndex) {
       allIndexes.push(url);
       if (result.childSitemaps.length > 0) {
-        await discoverSitemaps(
-          result.childSitemaps,
-          visited,
-          allUrls,
-          allSitemaps,
-          allIndexes,
-          depth + 1
-        );
+        await discoverSitemaps(result.childSitemaps, visited, allSitemaps, allIndexes, depth + 1);
       }
     } else {
       allSitemaps.push(url);
-      for (const u of result.urls) {
-        if (!allUrls.includes(u)) {
-          allUrls.push(u);
-        }
-      }
     }
   }
 }
@@ -148,16 +132,14 @@ export const sitemap: ActiveModule = {
       }
 
       const visited = new Set<string>();
-      const allUrls: string[] = [];
       const allSitemaps: string[] = [];
       const allIndexes: string[] = [];
 
-      await discoverSitemaps(checkedUrls, visited, allUrls, allSitemaps, allIndexes);
+      await discoverSitemaps(checkedUrls, visited, allSitemaps, allIndexes);
 
       const result: SitemapResult = {
         sitemapIndexes: allIndexes,
         sitemaps: allSitemaps,
-        urls: allUrls.slice(0, 1000),
       };
 
       return { success: true, data: result };
