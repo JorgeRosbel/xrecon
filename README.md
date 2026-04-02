@@ -85,6 +85,16 @@ xrecon search passive
 xrecon search email
 ```
 
+![Search modules](.github/search.png)
+
+### List all modules
+
+```bash
+xrecon list
+```
+
+![List all modules](.github/list.png)
+
 ### Passive Modules
 
 | Flag               | Module     | Description                       |
@@ -137,6 +147,8 @@ xrecon example.com -P
 ```bash
 xrecon example.com -s -c
 ```
+
+![Security headers scan](.github/tech%20and%20headers.png)
 
 ### Tech stack detection with WordPress plugins
 
@@ -211,12 +223,6 @@ xrecon search -w
 
 # Find modules by keyword
 xrecon search email
-```
-
-### List all modules
-
-```bash
-xrecon list
 ```
 
 ## Requirements
