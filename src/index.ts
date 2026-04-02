@@ -189,7 +189,7 @@ async function runModules() {
     await browser.close();
   }
 
-  mainSpinner.succeed();
+  mainSpinner.succeed('COMPLETADO');
 
   const output: ScanOutput = { target, results: results as Results };
   formatCliOutput(target, results as Results);
