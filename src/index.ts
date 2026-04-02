@@ -256,6 +256,25 @@ program
   .option('-k, --cookies', 'Detect cookies [ACTIVE]')
   .option('-K, --storage', 'Extract localStorage/sessionStorage and JWT tokens [ACTIVE]');
 
+program
+  .command('search <query>')
+  .description('Search modules by keyword (flag, name, or description)')
+  .action(query => {
+    const { searchModules, displaySearchResults } = require('./utils/search');
+    const results = searchModules(query);
+    displaySearchResults(query, results);
+    process.exit(0);
+  });
+
+program
+  .command('list')
+  .description('List all available modules')
+  .action(() => {
+    const { listAllModules } = require('./utils/search');
+    listAllModules();
+    process.exit(0);
+  });
+
 program.parse(process.argv);
 
 runModules();

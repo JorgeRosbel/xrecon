@@ -51,6 +51,26 @@ xrecon example.com -H -oN results.json
 | `-V, --version`             | Show version number                             |
 | `--help`                    | Display help information                        |
 
+### Search & List Commands
+
+| Command                   | Description                                     |
+| ------------------------- | ----------------------------------------------- |
+| `xrecon search <keyword>` | Search modules by keyword, flag, or description |
+| `xrecon list`             | List all available modules                      |
+
+**Search examples:**
+
+```bash
+# Search by keyword
+xrecon search tech
+
+# Search by flag
+xrecon search -T
+
+# Search by description
+xrecon search email
+```
+
 ### Passive Modules
 
 | Flag               | Module     | Description                       |
@@ -134,6 +154,9 @@ xrecon example.com -H -oJ scan.json
 ### Save results as HTML
 
 ```bash
+xrecon example.com -H -oH
+# Saves to output.html
+
 xrecon example.com -H -oH report.html
 # Saves to report.html
 ```
@@ -154,6 +177,25 @@ xrecon example.com -J
 
 ```bash
 xrecon example.com -T -W
+```
+
+### Search for modules
+
+```bash
+# Find modules related to security
+xrecon search security
+
+# Find modules by flag
+xrecon search -w
+
+# Find modules by keyword
+xrecon search email
+```
+
+### List all modules
+
+```bash
+xrecon list
 ```
 
 ## Requirements
