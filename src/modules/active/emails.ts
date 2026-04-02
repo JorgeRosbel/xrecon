@@ -1,10 +1,17 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData, EmailResult } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
 export const emails: ActiveModule = {
   name: 'emails',
-  async run(_target: string, sharedData: SharedHtmlData): Promise<ModuleResult<EmailResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<EmailResult>> {
     try {
-      const { html, $ } = sharedData;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
+
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const { html, $ } = data;
 
       const pattern =
         /[a-zA-Z0-9._%+-]+@(?!.*(?:\.png|\.webp|\.jpg|\.jpeg|\.gif|\.svg))[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/gi;

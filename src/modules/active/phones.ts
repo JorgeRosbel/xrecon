@@ -1,10 +1,17 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData, PhoneResult } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
 export const phones: ActiveModule = {
   name: 'phones',
-  async run(_target: string, sharedData: SharedHtmlData): Promise<ModuleResult<PhoneResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<PhoneResult>> {
     try {
-      const { html } = sharedData;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
+
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const { html } = data;
 
       const pattern =
         /(?:\+|00)[1-9][0-9]{0,2}[ -]?(?:\([0-9]{1,4}\)|[0-9]{1,4})(?:[ -]?[0-9]){6,12}/gi;

@@ -1,4 +1,5 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData, SocialResult } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
 const SOCIAL_PATTERNS: Record<string, string[]> = {
   facebook: ['facebook\\.com/[\\w.-]+', 'fb\\.com/[\\w.-]+'],
@@ -15,9 +16,15 @@ const SOCIAL_PATTERNS: Record<string, string[]> = {
 
 export const social: ActiveModule = {
   name: 'social',
-  async run(_target: string, sharedData: SharedHtmlData): Promise<ModuleResult<SocialResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<SocialResult>> {
     try {
-      const { html, $ } = sharedData;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
+
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const { html, $ } = data;
       const found: Record<string, string[]> = {};
 
       for (const [platform, patterns] of Object.entries(SOCIAL_PATTERNS)) {

@@ -1,12 +1,19 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
 export type ScriptsResult = string[];
 
 export const scripts: ActiveModule = {
   name: 'scripts',
-  async run(_target: string, sharedData: SharedHtmlData): Promise<ModuleResult<ScriptsResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<ScriptsResult>> {
     try {
-      const { $, url } = sharedData;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
+
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const { $, url } = data;
       const baseUrl = new URL(url);
 
       const found: string[] = [];

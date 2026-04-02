@@ -1,12 +1,19 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
 export type CommentsResult = string[];
 
 export const comments: ActiveModule = {
   name: 'comments',
-  async run(_target: string, sharedData: SharedHtmlData): Promise<ModuleResult<CommentsResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<CommentsResult>> {
     try {
-      const { $ } = sharedData;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
+
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const { $ } = data;
 
       const html = $.html();
       const commentRegex = /<!--([\s\S]*?)-->/g;

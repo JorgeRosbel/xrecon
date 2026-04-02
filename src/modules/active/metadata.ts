@@ -1,4 +1,5 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
+import { getHtml } from '@/utils/get_html';
 
 export interface MetadataResult {
   title: string;
@@ -7,9 +8,15 @@ export interface MetadataResult {
 
 export const metadata: ActiveModule = {
   name: 'metadata',
-  async run(target: string, sharedData: SharedHtmlData): Promise<ModuleResult<MetadataResult>> {
+  async run(target: string, sharedData?: SharedHtmlData): Promise<ModuleResult<MetadataResult>> {
     try {
-      const { $ } = sharedData;
+      const fullUrl =
+        target.startsWith('http://') || target.startsWith('https://')
+          ? target
+          : `https://${target}`;
+
+      const data = sharedData ?? (await getHtml(fullUrl));
+      const { $ } = data;
 
       const title =
         $('title').text().trim() || $('meta[property="og:title"]').attr('content') || '';
