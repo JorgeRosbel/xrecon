@@ -6,6 +6,7 @@ export { ssl } from './ssl';
 export { os } from './os';
 export { metadata } from './metadata';
 export { comments } from './comments';
+export { scripts } from './scripts';
 export { emails } from './emails';
 export { phones } from './phones';
 export { sitemap } from './sitemap';

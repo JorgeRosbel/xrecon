@@ -69,6 +69,7 @@ async function runModules() {
     'os',
     'metadata',
     'comments',
+    'scripts',
     'emails',
     'phones',
     'sitemap',
@@ -245,6 +246,7 @@ program
   .option('-O, --os', 'OS detection via TTL [ACTIVE]')
   .option('-i, --metadata', 'Page title and meta description [ACTIVE]')
   .option('-C, --comments', 'Extract HTML comments [ACTIVE]')
+  .option('-J, --scripts', 'Extract JavaScript file URLs [ACTIVE]')
   .option('-e, --emails', 'Extract emails [ACTIVE]')
   .option('-p, --phones', 'Extract phone numbers [ACTIVE]')
   .option('-M, --sitemap', 'Sitemap URLs [ACTIVE]')

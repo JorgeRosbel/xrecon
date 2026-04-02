@@ -160,6 +160,7 @@ export interface Results {
   os?: ModuleResult<OSResult>;
   metadata?: ModuleResult<MetadataResult>;
   comments?: ModuleResult<string[]>;
+  scripts?: ModuleResult<string[]>;
   emails?: ModuleResult<EmailResult>;
   phones?: ModuleResult<PhoneResult>;
   sitemap?: ModuleResult<SitemapResult>;
