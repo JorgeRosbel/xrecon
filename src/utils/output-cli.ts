@@ -98,7 +98,7 @@ function formatModuleDataPlain(moduleName: string, result: ModuleResult): string
         if (idx < data.length - 1) lines.push('');
       });
     } else {
-      lines.push(`  ${data.join('\n  ')}`);
+      lines.push(`  ${formatValuePlain(moduleName, data)}`);
     }
   } else if (typeof data === 'object') {
     Object.entries(data as Record<string, unknown>).forEach(([key, value]) => {
@@ -137,7 +137,7 @@ function formatModuleData(moduleName: string, result: ModuleResult): string {
         if (idx < data.length - 1) lines.push('');
       });
     } else {
-      lines.push(`  ${data.join('\n  ')}`);
+      lines.push(`  ${formatValue(moduleName, data)}`);
     }
   } else if (typeof data === 'object') {
     Object.entries(data as Record<string, unknown>).forEach(([key, value]) => {
