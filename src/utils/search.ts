@@ -144,7 +144,7 @@ const MODULES: ModuleInfo[] = [
 ];
 
 const fuse = new Fuse(MODULES, {
-  keys: ['name', 'flag', 'description'],
+  keys: ['name', 'description'],
   threshold: 0.4,
   includeScore: true,
 });
