@@ -54,6 +54,18 @@ function formatValuePlain(key: string, value: unknown): string {
     ) {
       return '\n' + value.map((v, i) => `  ${i + 1}. ${v}`).join('\n');
     }
+    if (typeof value[0] === 'object' && value[0] !== null) {
+      return (
+        '\n' +
+        value
+          .map((item, i) => {
+            const entries = Object.entries(item as Record<string, unknown>);
+            const itemLines = entries.map(([k, v]) => `    ${k}: ${formatValuePlain(k, v)}`);
+            return i === 0 ? itemLines.join('\n') : '\n' + itemLines.join('\n');
+          })
+          .join('\n')
+      );
+    }
     return value.map(v => String(v)).join(', ');
   }
   if (typeof value === 'object') {
@@ -84,6 +96,18 @@ function formatValue(key: string, value: unknown): string {
       typeof value[0] === 'string'
     ) {
       return '\n' + value.map((v, i) => `    ${i + 1}. ${v}`).join('\n');
+    }
+    if (typeof value[0] === 'object' && value[0] !== null) {
+      return (
+        '\n' +
+        value
+          .map((item, i) => {
+            const entries = Object.entries(item as Record<string, unknown>);
+            const itemLines = entries.map(([k, v]) => `    ${chalk.cyan(k)}: ${formatValue(k, v)}`);
+            return i === 0 ? itemLines.join('\n') : '\n' + itemLines.join('\n');
+          })
+          .join('\n')
+      );
     }
     return value.map(v => String(v)).join(', ');
   }
