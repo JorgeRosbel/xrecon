@@ -3,7 +3,6 @@ import { promisify } from 'util';
 import { program } from 'commander';
 import fs from 'fs/promises';
 import chalk from 'chalk';
-import ora from 'ora';
 
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
@@ -14,6 +13,7 @@ import * as activeModules from '@/modules/active';
 import { getHtml } from '@/utils/get_html';
 import { generateHtmlOutput } from '@/utils/output-html';
 import { formatCliOutput, formatCliOutputPlain } from '@/utils/output-cli';
+import { initProgress, setWorking, setDone, setFailed, clearProgress } from '@/utils/progress';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
 const VERSION = '0.0.1';
@@ -101,12 +101,13 @@ async function runModules() {
   let sharedHtmlData: SharedHtmlData | undefined;
   let browser: Browser | null = null;
   let browserContext: BrowserContext | null = null;
-  const fetchSpinner = ora({ text: 'Fetching page...', prefixText: '  ' }).start();
+
+  console.log('Fetching page...');
 
   if (runActive) {
     try {
       sharedHtmlData = await getHtml(target);
-      fetchSpinner.succeed('Page fetched');
+      console.log('Page fetched ✓');
 
       if (needsPlaywright(activeToRun)) {
         browser = await chromium.launch({ headless: true });
@@ -121,31 +122,27 @@ async function runModules() {
         sharedHtmlData.browserContext = browserContext;
       }
     } catch (error) {
-      fetchSpinner.fail('Failed to fetch page');
+      console.error('Failed to fetch page');
       console.error(
         `Warning: Could not fetch page data: ${error instanceof Error ? error.message : String(error)}`
       );
       sharedHtmlData = undefined;
     }
-  } else {
-    fetchSpinner.stop();
   }
 
   const results: Partial<Results> = {};
 
   const runPassiveModules = async (moduleNames: string[]) => {
-    const spinners = moduleNames.map(moduleName => {
-      const spinner = ora({ text: moduleName, prefixText: '  ' }).start();
-      return { moduleName, spinner };
-    });
+    initProgress(moduleNames);
 
-    const promises = spinners.map(async ({ moduleName, spinner }) => {
+    const promises = moduleNames.map(async moduleName => {
+      setWorking(moduleName);
       const mod = passiveModules[moduleName as keyof typeof passiveModules];
       if (mod?.run) {
         try {
           const result = await mod.run(target);
           (results as Record<string, unknown>)[moduleName] = result;
-          spinner.succeed();
+          setDone(moduleName);
           if (moduleName === 'robots' && result.success && result.data) {
             const data = result.data as { sitemaps?: string[] };
             if (data.sitemaps && sharedHtmlData) {
@@ -157,36 +154,36 @@ async function runModules() {
             success: false,
             error: String(error),
           };
-          spinner.fail();
+          setFailed(moduleName);
         }
       }
     });
     await Promise.all(promises);
+    clearProgress();
   };
 
   const runActiveModules = async (moduleNames: string[]) => {
-    const spinners = moduleNames.map(moduleName => {
-      const spinner = ora({ text: moduleName, prefixText: '  ' }).start();
-      return { moduleName, spinner };
-    });
+    initProgress(moduleNames);
 
-    const promises = spinners.map(async ({ moduleName, spinner }) => {
+    const promises = moduleNames.map(async moduleName => {
+      setWorking(moduleName);
       const mod = activeModules[moduleName as keyof typeof activeModules];
       if (mod?.run) {
         try {
           const result = await mod.run(target, sharedHtmlData);
           (results as Record<string, unknown>)[moduleName] = result;
-          spinner.succeed();
+          setDone(moduleName);
         } catch (error) {
           (results as Record<string, unknown>)[moduleName] = {
             success: false,
             error: String(error),
           };
-          spinner.fail();
+          setFailed(moduleName);
         }
       }
     });
     await Promise.all(promises);
+    clearProgress();
   };
 
   if (runPassiveOnly) {
