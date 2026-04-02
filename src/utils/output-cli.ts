@@ -31,6 +31,23 @@ const MODULE_TYPES: Record<string, 'passive' | 'active'> = {
   storage: 'active',
 };
 
+function formatValuePlain(key: string, value: unknown): string {
+  if (value === null || value === undefined) return 'null';
+  if (Array.isArray(value)) {
+    if (value.length === 0) return 'empty';
+    if (['disallowed', 'allowed', 'sitemaps'].includes(key) && typeof value[0] === 'string') {
+      return '\n' + value.map(v => `  - ${v}`).join('\n');
+    }
+    return value.map(v => String(v)).join(', ');
+  }
+  if (typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>);
+    if (entries.length === 0) return 'empty';
+    return entries.map(([k, v]) => `${k}: ${formatValuePlain(k, v)}`).join('\n');
+  }
+  return String(value);
+}
+
 function formatValue(key: string, value: unknown): string {
   if (value === null || value === undefined) return chalk.gray('null');
   if (Array.isArray(value)) {
@@ -46,6 +63,45 @@ function formatValue(key: string, value: unknown): string {
     return entries.map(([k, v]) => `${chalk.cyan(k)}: ${formatValue(k, v)}`).join('\n');
   }
   return String(value);
+}
+
+function formatModuleDataPlain(moduleName: string, result: ModuleResult): string {
+  if (!result.success) {
+    return `  Error: ${result.error}`;
+  }
+
+  if (!result.data) {
+    return '  No data';
+  }
+
+  const data = result.data;
+  const lines: string[] = [];
+
+  if (Array.isArray(data)) {
+    if (data.length === 0) {
+      return '  No results';
+    }
+    if (typeof data[0] === 'object') {
+      data.forEach((item, idx) => {
+        const entries = Object.entries(item as Record<string, unknown>);
+        entries.forEach(([k, v]) => {
+          lines.push(`  ${k}: ${formatValuePlain(k, v)}`);
+        });
+        if (idx < data.length - 1) lines.push('');
+      });
+    } else {
+      lines.push(`  ${data.join('\n  ')}`);
+    }
+  } else if (typeof data === 'object') {
+    Object.entries(data as Record<string, unknown>).forEach(([key, value]) => {
+      const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      lines.push(`  ${label}: ${formatValuePlain(key, value)}`);
+    });
+  } else {
+    lines.push(`  ${formatValuePlain('', data)}`);
+  }
+
+  return lines.join('\n');
 }
 
 function formatModuleData(moduleName: string, result: ModuleResult): string {
@@ -87,6 +143,18 @@ function formatModuleData(moduleName: string, result: ModuleResult): string {
   return lines.join('\n');
 }
 
+function formatModulePlain(module: FormattedModule): string {
+  const { name, type, result } = module;
+  const title = name.charAt(0).toUpperCase() + name.slice(1);
+  const typeLabel = type === 'passive' ? '[PASSIVE]' : '[ACTIVE]';
+  const status = result.success ? '✓' : '✗';
+
+  const header = `${status} ${title} ${typeLabel}`;
+  const content = formatModuleDataPlain(name, result);
+
+  return `${header}\n${content}`;
+}
+
 function formatModule(module: FormattedModule): string {
   const { name, type, result } = module;
   const title = name.charAt(0).toUpperCase() + name.slice(1);
@@ -102,7 +170,7 @@ function formatModule(module: FormattedModule): string {
   return `${header}\n${content}`;
 }
 
-export function formatCliOutput(target: string, results: Results): void {
+function formatOutput(target: string, results: Results, useColors: boolean): string {
   const modules: FormattedModule[] = Object.entries(results).map(([name, result]) => ({
     name,
     type: MODULE_TYPES[name] || 'active',
@@ -113,45 +181,64 @@ export function formatCliOutput(target: string, results: Results): void {
   const failed = modules.filter(m => !m.result.success).length;
   const total = modules.length;
 
-  const statsLine = [
-    chalk.green(`✓ ${successful} successful`),
-    failed > 0 ? chalk.red(`✗ ${failed} failed`) : chalk.gray(`✗ ${failed} failed`),
-    chalk.gray(`${total} total`),
-  ].join(' | ');
+  const statsLine = useColors
+    ? [
+        chalk.green(`✓ ${successful} successful`),
+        failed > 0 ? chalk.red(`✗ ${failed} failed`) : chalk.gray(`✗ ${failed} failed`),
+        chalk.gray(`${total} total`),
+      ].join(' | ')
+    : [`✓ ${successful} successful`, `✗ ${failed} failed`, `${total} total`].join(' | ');
 
-  const headerBox = boxen(
-    `${chalk.bold.cyan('🔍 xrecon Scan Results')}\n\n` +
-      `${chalk.cyan('Target:')} ${target}\n` +
-      `${statsLine}`,
-    {
-      padding: 1,
-      borderStyle: 'round',
-      borderColor: 'cyan',
-      titleAlignment: 'center',
-    }
-  );
+  const title = useColors ? chalk.bold.cyan('xrecon Scan Results') : 'xrecon Scan Results';
+  const targetLabel = useColors ? chalk.cyan('Target:') : 'Target:';
+  const headerBox = boxen(`${title}\n\n${targetLabel} ${target}\n${statsLine}`, {
+    padding: 1,
+    borderStyle: 'round',
+    borderColor: useColors ? 'cyan' : 'gray',
+    titleAlignment: 'center',
+  });
 
-  console.log(headerBox);
+  let output = headerBox + '\n';
 
   const passiveModules = modules.filter(m => m.type === 'passive');
   const activeModules = modules.filter(m => m.type === 'active');
 
+  const fmtModule = useColors ? formatModule : formatModulePlain;
+  const fmtSection = useColors
+    ? chalk.bold.underline('\nPassive Modules\n')
+    : '\nPassive Modules\n';
+  const fmtSectionActive = useColors
+    ? chalk.bold.underline('\nActive Modules\n')
+    : '\nActive Modules\n';
+
   if (passiveModules.length > 0) {
-    console.log(chalk.bold.underline('\nPassive Modules\n'));
+    output += fmtSection + '\n';
     passiveModules.forEach(m => {
-      console.log(formatModule(m));
-      console.log('');
+      output += fmtModule(m) + '\n\n';
     });
   }
 
   if (activeModules.length > 0) {
-    console.log(chalk.bold.underline('\nActive Modules\n'));
+    output += fmtSectionActive + '\n';
     activeModules.forEach(m => {
-      console.log(formatModule(m));
-      console.log('');
+      output += fmtModule(m) + '\n\n';
     });
   }
 
-  console.log(chalk.gray('─'.repeat(50)));
-  console.log(chalk.gray('  Results saved to JSON/HTML with -oJ / -oH flags'));
+  const divider = useColors ? chalk.gray('─'.repeat(50)) : '─'.repeat(50);
+  const footer = useColors
+    ? chalk.gray('  Results saved to JSON/HTML with -oJ / -oH flags')
+    : '  Results saved to JSON/HTML with -oJ / -oH flags';
+
+  output += divider + '\n' + footer;
+
+  return output;
+}
+
+export function formatCliOutput(target: string, results: Results): void {
+  console.log(formatOutput(target, results, true));
+}
+
+export function formatCliOutputPlain(target: string, results: Results): string {
+  return formatOutput(target, results, false);
 }

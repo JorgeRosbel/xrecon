@@ -12,7 +12,7 @@ import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
 import { getHtml } from '@/utils/get_html';
 import { generateHtmlOutput } from '@/utils/output-html';
-import { formatCliOutput } from '@/utils/output-cli';
+import { formatCliOutput, formatCliOutputPlain } from '@/utils/output-cli';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
 const VERSION = '0.0.1';
@@ -208,7 +208,8 @@ async function runModules() {
   }
 
   if (outputText) {
-    await fs.writeFile(outputText, jsonOutput, 'utf-8');
+    const plainOutput = formatCliOutputPlain(target, results as Results);
+    await fs.writeFile(outputText, plainOutput, 'utf-8');
     console.error(chalk.green(`✓ Output saved to: ${outputText}`));
   }
 }
