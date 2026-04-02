@@ -142,13 +142,13 @@ xrecon example.com -H
 xrecon example.com -P
 ```
 
-### SSL and security headers
+### Tech detection and HTTP headers
 
 ```bash
-xrecon example.com -s -c
+xrecon example.com -T -h
 ```
 
-![Security headers scan](.github/tech%20and%20headers.png)
+![Tech and headers scan](.github/tech%20and%20headers.png)
 
 ### Tech stack detection with WordPress plugins
 
