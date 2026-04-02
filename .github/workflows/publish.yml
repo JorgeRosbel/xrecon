@@ -23,14 +23,14 @@ jobs:
       - name: Use PNPM
         uses: pnpm/action-setup@v4
         with:
-          version: 9.0.6
+          version: 10.18.1
 
       - name: Use Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: "https://registry.npmjs.org"
-          cache: "pnpm"
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
       - name: Update npm for OIDC support
         run: npm install -g npm@latest
@@ -67,4 +67,3 @@ jobs:
       - name: Publish skipped (already published)
         if: steps.npm.outputs.exists == 'true'
         run: echo "${{ steps.pkg.outputs.name }}@${{ steps.pkg.outputs.version }} already exists on npm; skipping publish."
-
