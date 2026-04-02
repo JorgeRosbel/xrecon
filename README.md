@@ -45,6 +45,26 @@ pnpm build
 pnpm link
 ```
 
+## Playwright Setup
+
+xrecon uses [Playwright](https://playwright.dev) with a headless Chromium browser to scan dynamic websites (SPAs built with React, Vue, Angular, etc.).
+
+**For static sites:** xrecon works out of the box — no extra setup needed.
+
+**For dynamic sites:** If you see the warning below, it means Playwright's browser binary is not installed:
+
+```
+⚠ Warning: Dynamic content unavailable. Run "npx playwright install" to enable full scanning of dynamic sites.
+```
+
+To enable full scanning of dynamic sites, install the browser binary:
+
+```bash
+npx playwright install
+```
+
+This downloads ~150MB of Chromium and only needs to be done once. After that, xrecon will render JavaScript-heavy pages just like a real browser.
+
 ## Usage
 
 ```bash
