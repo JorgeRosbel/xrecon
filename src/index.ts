@@ -131,18 +131,12 @@ async function runModules() {
   const results: Partial<Results> = {};
 
   const runPassiveModules = async (moduleNames: string[]) => {
-    const spinners = moduleNames.map(moduleName => {
-      const spinner = ora({ text: moduleName, prefixText: '  ' }).start();
-      return { moduleName, spinner };
-    });
-
-    const promises = spinners.map(async ({ moduleName, spinner }) => {
+    const promises = moduleNames.map(async moduleName => {
       const mod = passiveModules[moduleName as keyof typeof passiveModules];
       if (mod?.run) {
         try {
           const result = await mod.run(target);
           (results as Record<string, unknown>)[moduleName] = result;
-          spinner.succeed();
           if (moduleName === 'robots' && result.success && result.data) {
             const data = result.data as { sitemaps?: string[] };
             if (data.sitemaps && sharedHtmlData) {
@@ -154,7 +148,6 @@ async function runModules() {
             success: false,
             error: String(error),
           };
-          spinner.fail();
         }
       }
     });
@@ -162,24 +155,17 @@ async function runModules() {
   };
 
   const runActiveModules = async (moduleNames: string[]) => {
-    const spinners = moduleNames.map(moduleName => {
-      const spinner = ora({ text: moduleName, prefixText: '  ' }).start();
-      return { moduleName, spinner };
-    });
-
-    const promises = spinners.map(async ({ moduleName, spinner }) => {
+    const promises = moduleNames.map(async moduleName => {
       const mod = activeModules[moduleName as keyof typeof activeModules];
       if (mod?.run) {
         try {
           const result = await mod.run(target, sharedHtmlData);
           (results as Record<string, unknown>)[moduleName] = result;
-          spinner.succeed();
         } catch (error) {
           (results as Record<string, unknown>)[moduleName] = {
             success: false,
             error: String(error),
           };
-          spinner.fail();
         }
       }
     });
