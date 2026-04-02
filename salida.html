@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>xrecon - https://geofisik.com</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    :root {
+      --background: #09090b;
+      --foreground: #fafafa;
+      --card: #18181b;
+      --card-foreground: #fafafa;
+      --primary: #22d3ee;
+      --primary-foreground: #09090b;
+      --muted: #71717a;
+      --border: #27272a;
+      --success: #22c55e;
+      --error: #ef4444;
+      --accent: #6366f1;
+      --surface: #27272a;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      line-height: 1.5;
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .container { max-width: 1400px; margin: 0 auto; }
+    
+    header {
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .header-left h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.25rem;
+    }
+    
+    .header-left .subtitle {
+      color: var(--muted);
+      font-size: 0.875rem;
+    }
+    
+    .header-right {
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    
+    .target-url {
+      color: var(--primary);
+      font-weight: 500;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    
+    .stat-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(34, 211, 238, 0.1);
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    
+    .stat-value.success { color: var(--success); }
+    .stat-value.error { color: var(--error); }
+    .stat-value.total { color: var(--primary); }
+    
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    section {
+      margin-bottom: 3rem;
+    }
+    
+    section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      padding-left: 0.5rem;
+      border-left: 3px solid var(--primary);
+    }
+    
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 1rem;
+    }
+    
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    
+    .card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 30px rgba(34, 211, 238, 0.1);
+      transform: translateY(-2px);
+    }
+    
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.875rem 1rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .card-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      text-transform: capitalize;
+    }
+    
+    .badge {
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.25rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    .badge-passive {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+    
+    .badge-active {
+      background: rgba(34, 211, 238, 0.2);
+      color: var(--primary);
+      border: 1px solid rgba(34, 211, 238, 0.3);
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    .status-dot.success {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+    
+    .status-dot.error {
+      background: var(--error);
+      box-shadow: 0 0 8px var(--error);
+    }
+    
+    .card-body {
+      padding: 1rem;
+      font-size: 0.85rem;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .card-body::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .card-body::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+    
+    .card-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px;
+    }
+    
+    .card-body::-webkit-scrollbar-thumb:hover {
+      background: var(--muted);
+    }
+    
+    .bullet-list {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .bullet-list li {
+      padding: 0.375rem 0;
+      padding-left: 1.25rem;
+      position: relative;
+      word-break: break-all;
+    }
+    
+    .bullet-list li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+    }
+    
+    .field {
+      padding: 0.25rem 0;
+    }
+    
+    .field-key {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    
+    .field-value {
+      color: var(--foreground);
+    }
+    
+    .text-muted {
+      color: var(--muted);
+      font-style: italic;
+    }
+    
+    .error-text {
+      color: var(--error);
+    }
+    
+    .link {
+      color: var(--primary);
+      text-decoration: none;
+      word-break: break-all;
+    }
+    
+    .link:hover {
+      text-decoration: underline;
+    }
+    
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+    
+    @media (max-width: 768px) {
+      body { padding: 1rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      header { flex-direction: column; align-items: flex-start; }
+      .header-right { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <h1>xrecon</h1>
+        <p class="subtitle">OSINT Web Reconnaissance Tool</p>
+      </div>
+      <div class="header-right">
+        <p>Target: <span class="target-url">https://geofisik.com</span></p>
+        <p>Generated: 2/4/2026, 2:45:17</p>
+      </div>
+    </header>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-value success">17</span>
+        <span class="stat-label">Successful</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value error">5</span>
+        <span class="stat-label">Failed</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value total">22</span>
+        <span class="stat-label">Total Modules</span>
+      </div>
+    </div>
+    
+    
+    <section>
+      <h2>Passive Modules</h2>
+      <div class="cards-grid">
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">txt</span>
+              <span class="badge badge-passive">PASSIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>v=spf1 include:_spf.mail.hostinger.com ~all</li></ul></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">mx</span>
+              <span class="badge badge-passive">PASSIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body">preference: 10<br>mail_server: mx2.hostinger.com<br>preference: 5<br>mail_server: mx1.hostinger.com</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">whois</span>
+              <span class="badge badge-passive">PASSIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">domain_name:</span> <span class="field-value">GEOFISIK.COM</span></div><div class="field"><span class="field-key">edge_ip:</span> <span class="field-value">91.108.103.213</span></div><div class="field"><span class="field-key">nameservers:</span> <span class="field-value"><ul class="bullet-list"><li>ns1.dns-parking.com</li><li>ns2.dns-parking.com</li></ul></span></div><div class="field"><span class="field-key">registrar:</span> <span class="field-value"><a href="http://www.namecheap.com" target="_blank" class="link">http://www.namecheap.com</a></span></div><div class="field"><span class="field-key">creation_date:</span> <span class="field-value">10/03/24</span></div><div class="field"><span class="field-key">expiration_date:</span> <span class="field-value">10/03/27</span></div><div class="field"><span class="field-key">remaining_time_in_days:</span> <span class="field-value">341</span></div><div class="field"><span class="field-key">status:</span> <span class="field-value">client transfer prohibited</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">geo</span>
+              <span class="badge badge-passive">PASSIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">country:</span> <span class="field-value">United Kingdom</span></div><div class="field"><span class="field-key">city:</span> <span class="field-value">Manchester</span></div><div class="field"><span class="field-key">isp:</span> <span class="field-value">Hostinger International Limited</span></div><div class="field"><span class="field-key">ip:</span> <span class="field-value">89.116.109.75</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">subdomains</span>
+              <span class="badge badge-passive">PASSIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>mail.geofisik.com</li><li>tool.geofisik.com</li><li>webdisk.geofisik.com</li><li>www.geofisik.com</li></ul></div>
+        </div>
+      </div>
+    </section>
+    
+    
+    
+    <section>
+      <h2>Active Modules</h2>
+      <div class="cards-grid">
+        
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">tech</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body">name: Astro<br>category: Framework<br>evidence: Found _astro/ in HTML<br>name: Google Analytics<br>category: Analytics<br>evidence: Found gtag/google-analytics in HTML<br>name: Google Tag Manager<br>category: Analytics<br>evidence: Found googletagmanager in HTML<br>name: Tailwind CSS<br>category: CSS<br>evidence: Found Tailwind utility classes in HTML</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">wplugins</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot error"></span>
+          </div>
+          <div class="card-body"><span class="error-text">No WordPress plugins found</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">metadata</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">title:</span> <span class="field-value">Geofisik — Expertos en Ingeniería Geofísica Aplicada a la Geotecnia</span></div><div class="field"><span class="field-key">description:</span> <span class="field-value">Geofisik es una empresa Mexicana que se especializa en la geofísica aplicada a la geotecnia y la mecánica de suelos. Ofrece soluciones innovadoras que permiten reducir costos y riesgos en obras civiles y de infraestructura.</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">comments</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot error"></span>
+          </div>
+          <div class="card-body"><span class="error-text">No HTML comments found</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">scripts</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>https://www.googletagmanager.com/gtag/js?id=G-X92LT70PQP</li><li>https://geofisik.com/_astro/ClientRouter.astro_astro_type_script_index_0_lang.BZs-2RF_.js</li></ul></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">emails</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>contacto@geofisik.com</li></ul></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">phones</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>+529981583350</li></ul></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">social</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">twitter:</span> <span class="field-value"><ul class="bullet-list"><li>https://twitter.com/intent</li></ul></span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">cookies</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot error"></span>
+          </div>
+          <div class="card-body"><span class="error-text">No cookies found</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">storage</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot error"></span>
+          </div>
+          <div class="card-body"><span class="error-text">No storage data found</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">ssl</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">commonName:</span> <span class="field-value">geofisik.com</span></div><div class="field"><span class="field-key">issuer:</span> <span class="field-value">Let's Encrypt</span></div><div class="field"><span class="field-key">validFrom:</span> <span class="field-value">2026-03-24T16:53:09.000Z</span></div><div class="field"><span class="field-key">validTo:</span> <span class="field-value">2026-06-22T16:53:08.000Z</span></div><div class="field"><span class="field-key">daysLeft:</span> <span class="field-value">82</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">os</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">os:</span> <span class="field-value">Linux/Unix</span></div><div class="field"><span class="field-key">ttl:</span> <span class="field-value">50</span></div><div class="field"><span class="field-key">evidence:</span> <span class="field-value">TTL=50 (typical range: Linux/Unix=64, Windows=128, Solaris/AIX=254)</span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">robots</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><div class="field"><span class="field-key">url:</span> <span class="field-value"><a href="https://geofisik.com/robots.txt" target="_blank" class="link">https://geofisik.com/robots.txt</a></span></div><div class="field"><span class="field-key">disallowed:</span> <span class="field-value"><span class="text-muted">empty</span></span></div><div class="field"><span class="field-key">allowed:</span> <span class="field-value"><span class="text-muted">empty</span></span></div><div class="field"><span class="field-key">sitemaps:</span> <span class="field-value"><ul class="bullet-list"><li>https://geofisik.com/sitemap-index.xml</li></ul></span></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">headers</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>server: hcdn</li><li>content-type: text/html</li><li>etag: &quot;1a0ed-68cc6d82-a9e4f028c2cd6c76;br&quot;</li></ul></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">security</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>[FAIL] strict-transport-security</li><li>[PASS] content-security-policy</li><li>[FAIL] x-frame-options</li><li>[FAIL] x-content-type-options</li><li>[FAIL] referrer-policy</li><li>[FAIL] permissions-policy</li></ul></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">sitemap</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot error"></span>
+          </div>
+          <div class="card-body"><span class="error-text">No sitemap found</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title-row">
+              <span class="card-title">routes</span>
+              <span class="badge badge-active">ACTIVE</span>
+            </div>
+            <span class="status-dot success"></span>
+          </div>
+          <div class="card-body"><ul class="bullet-list"><li>https://geofisik.com</li><li>https://geofisik.com/blog</li><li>https://geofisik.com/blog/2</li><li>https://geofisik.com/blog/3</li><li>https://geofisik.com/blog/4</li><li>https://geofisik.com/blog/5</li><li>https://geofisik.com/blog/6</li><li>https://geofisik.com/blog/7</li><li>https://geofisik.com/blog/categoria/condiciones-del-suelo</li><li>https://geofisik.com/blog/categoria/costos-y-beneficios</li><li>https://geofisik.com/blog/categoria/innovacion-tecnologica</li><li>https://geofisik.com/blog/categoria/metodos-geofisicos</li><li>https://geofisik.com/blog/categoria/metodos-geofisicos/2</li><li>https://geofisik.com/blog/categoria/metodos-geofisicos/3</li><li>https://geofisik.com/blog/categoria/obras-civiles</li><li>https://geofisik.com/blog/condiciones-del-suelo/arcillas-expansivas-san-luis-potosi-metodos-electricos</li><li>https://geofisik.com/blog/condiciones-del-suelo/cenotes-cavernas-quintana-roo</li><li>https://geofisik.com/blog/condiciones-del-suelo/error-comun-cimentaciones-estudio-sismico</li><li>https://geofisik.com/blog/condiciones-del-suelo/estudios-geofisicos-cdmx-normativa-suelo-blando</li><li>https://geofisik.com/blog/condiciones-del-suelo/estudios-suelos-vivienda-analisis-geofisico</li><li>https://geofisik.com/blog/condiciones-del-suelo/licuefaccion-costas-pacifico-evaluacion-geofisica</li><li>https://geofisik.com/blog/condiciones-del-suelo/rellenos-sanitarios-abandonados-identificacion-geofisica</li><li>https://geofisik.com/blog/condiciones-del-suelo/suelos-salinos-coahuila-caracterizacion-electrica</li><li>https://geofisik.com/blog/costos-y-beneficios/analisis-costo-beneficio-geofisica-vs-metodos-tradicionales</li><li>https://geofisik.com/blog/costos-y-beneficios/costo-estudio-geofisico-vs-riesgos-construir</li><li>https://geofisik.com/blog/costos-y-beneficios/impacto-financiero-omite-estudios-geotecnicos</li><li>https://geofisik.com/blog/costos-y-beneficios/invertir-en-geofisica-reduce-sobrecostos-construccion</li><li>https://geofisik.com/blog/costos-y-beneficios/roi-geofisica-costos-cimentacion</li><li>https://geofisik.com/blog/innovacion-tecnologica/blockchain-en-geofisica-certificacion-digital</li><li>https://geofisik.com/blog/innovacion-tecnologica/drones-geofisica-magnetometria-aerea</li><li>https://geofisik.com/blog/innovacion-tecnologica/geofisica-4-0-iot-monitoreo-continuo-estabilidad</li><li>https://geofisik.com/blog/innovacion-tecnologica/insar-detecta-subsidencia-complejo-industrial</li><li>https://geofisik.com/blog/innovacion-tecnologica/inteligencia-artificial-machine-learning-tomografias-electricas</li><li>https://geofisik.com/blog/innovacion-tecnologica/interferometria-insar-monitoreo-satelital-subsidencia</li><li>https://geofisik.com/blog/innovacion-tecnologica/realidad-aumentada-estructuras-subterraneas</li><li>https://geofisik.com/blog/innovacion-tecnologica/tendencias-2025-integracion-ia-machine-learning-interpretacion-geofisica</li><li>https://geofisik.com/blog/metodos-geofisicos/aeropuertos-caracterizacion-pistas-aterrizaje-metodos-sismicos</li><li>https://geofisik.com/blog/metodos-geofisicos/cambio-climatico-geotecnia-metodos-geofisicos</li><li>https://geofisik.com/blog/metodos-geofisicos/comparativa-metodos-refraccion-sismica-masw-tomografia-electrica</li><li>https://geofisik.com/blog/metodos-geofisicos/desafio-karst-yucateco-geofisica-colapsos-riviera-maya</li><li>https://geofisik.com/blog/metodos-geofisicos/deteccion-de-cavernas-metodos-geofisicos</li><li>https://geofisik.com/blog/metodos-geofisicos/geofisica-aplicada-geotecnia</li><li>https://geofisik.com/blog/metodos-geofisicos/geofisica-para-la-industria-petrolera</li><li>https://geofisik.com/blog/metodos-geofisicos/geofisica-para-pozos-de-agua</li><li>https://geofisik.com/blog/metodos-geofisicos/georradar-deteccion-servicios-sin-romper-pavimento</li><li>https://geofisik.com/blog/metodos-geofisicos/guia-metodo-hvsr-nakamura</li><li>https://geofisik.com/blog/metodos-geofisicos/lecciones-estudios-geofisicos-mexico</li><li>https://geofisik.com/blog/metodos-geofisicos/masw-vs-refraccion-sismica-estudio-suelos-2025</li><li>https://geofisik.com/blog/metodos-geofisicos/metodos-destructivos-vs-no-destructivos-geofisica-construccion-sostenible</li><li>https://geofisik.com/blog/metodos-geofisicos/minas-abandonadas-zacatecas-localizacion-tuneles-georradar</li><li>https://geofisik.com/blog/metodos-geofisicos/naves-industriales-optimizacion-zapatas-corridas-masw</li><li>https://geofisik.com/blog/metodos-geofisicos/optimizacion-cimentaciones-tomografia-electrica</li><li>https://geofisik.com/blog/metodos-geofisicos/presas-bordos-deteccion-filtraciones-metodos-geoelectricos</li><li>https://geofisik.com/blog/metodos-geofisicos/profundidad-estudio-geofisico</li><li>https://geofisik.com/blog/metodos-geofisicos/sondeo-electrico-vertical-sev-metodo-clasico-estudios-hidrogeologicos</li><li>https://geofisik.com/blog/metodos-geofisicos/subsidencia-valle-de-mexico-insar</li><li>https://geofisik.com/blog/metodos-geofisicos/tomografia-electrica-la-radiografia-del-subsuelo-que-previene-fallas-en-cimentaciones</li><li>https://geofisik.com/blog/obras-civiles/fallas-geologicas-mapeo-sismico</li><li>https://geofisik.com/blog/obras-civiles/geofisica-aplicada-carreteras-capacidad-soporte-pavimento</li><li>https://geofisik.com/blog/obras-civiles/geofisica-aplicada-hospitales-escuelas-zona-sismica</li><li>https://geofisik.com/blog/obras-civiles/parques-solares-evaluacion-geotecnica</li><li>https://geofisik.com/blog/obras-civiles/puentes-vehiculares-estudios-geofisicos-cimentaciones-profundas</li><li>https://geofisik.com/blog/obras-civiles/suelos-volcanicos-jalisco-caracterizacion-geofisica-cimentaciones-especiales</li><li>https://geofisik.com/blog/obras-civiles/temporada-huracanes-2025-evaluacion-post-siniestro-geofisica</li><li>https://geofisik.com/blog/obras-civiles/torres-telecomunicaciones-estudios-geofisicos-cimentaciones-5g</li><li>https://geofisik.com/blog/tag/beneficios</li><li>https://geofisik.com/blog/tag/carreteras</li><li>https://geofisik.com/blog/tag/casos</li><li>https://geofisik.com/blog/tag/cavernas</li><li>https://geofisik.com/blog/tag/cimentaciones</li><li>https://geofisik.com/blog/tag/cimentaciones/2</li><li>https://geofisik.com/blog/tag/clima</li><li>https://geofisik.com/blog/tag/costos</li><li>https://geofisik.com/blog/tag/georradar</li><li>https://geofisik.com/blog/tag/innovacion</li><li>https://geofisik.com/blog/tag/innovacion/2</li><li>https://geofisik.com/blog/tag/insar</li><li>https://geofisik.com/blog/tag/metodos</li><li>https://geofisik.com/blog/tag/metodos/2</li><li>https://geofisik.com/blog/tag/metodos/3</li><li>https://geofisik.com/blog/tag/metodos/4</li><li>https://geofisik.com/blog/tag/obras-civiles</li><li>https://geofisik.com/blog/tag/pozos</li><li>https://geofisik.com/blog/tag/sev</li><li>https://geofisik.com/blog/tag/sismica</li><li>https://geofisik.com/blog/tag/sismica/2</li><li>https://geofisik.com/blog/tag/subsuelo</li><li>https://geofisik.com/blog/tag/subsuelo/2</li><li>https://geofisik.com/blog/tag/subsuelo/3</li><li>https://geofisik.com/blog/tag/suelos</li><li>https://geofisik.com/blog/tag/suelos/2</li><li>https://geofisik.com/blog/tag/tecnologia</li><li>https://geofisik.com/blog/tag/tecnologia/2</li><li>https://geofisik.com/blog/tag/tendencias</li><li>https://geofisik.com/blog/tag/tomografia</li><li>https://geofisik.com/blog/tag/vivienda</li><li>https://geofisik.com/privacy</li><li>https://geofisik.com/terms</li><li>https://geofisik.com/tipo/comparativas</li><li>https://geofisik.com/tipo/guias</li><li>https://geofisik.com/tipo/reviews</li><li>https://geofisik.com/tipo/tops</li></ul></div>
+        </div>
+      </div>
+    </section>
+    
+    
+    <footer>
+      Generated with xrecon - OSINT CLI Tool
+    </footer>
+  </div>
+</body>
+</html>

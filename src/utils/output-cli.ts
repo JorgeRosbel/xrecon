@@ -38,10 +38,10 @@ function formatValuePlain(key: string, value: unknown): string {
   if (Array.isArray(value)) {
     if (value.length === 0) return 'empty';
     if (
-      ['disallowed', 'allowed', 'sitemaps', 'scripts'].includes(key) &&
+      ['disallowed', 'allowed', 'sitemaps', 'scripts', 'routes'].includes(key) &&
       typeof value[0] === 'string'
     ) {
-      return '\n' + value.map(v => `  - ${v}`).join('\n');
+      return '\n' + value.map((v, i) => `  ${i + 1}. ${v}`).join('\n');
     }
     return value.map(v => String(v)).join(', ');
   }
@@ -58,10 +58,10 @@ function formatValue(key: string, value: unknown): string {
   if (Array.isArray(value)) {
     if (value.length === 0) return chalk.gray('empty');
     if (
-      ['disallowed', 'allowed', 'sitemaps', 'scripts'].includes(key) &&
+      ['disallowed', 'allowed', 'sitemaps', 'scripts', 'routes'].includes(key) &&
       typeof value[0] === 'string'
     ) {
-      return '\n' + value.map(v => `    • ${v}`).join('\n');
+      return '\n' + value.map((v, i) => `    ${i + 1}. ${v}`).join('\n');
     }
     return value.map(v => String(v)).join(', ');
   }

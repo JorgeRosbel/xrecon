@@ -19,9 +19,15 @@ function formatValue(key: string, value: unknown): string {
   if (value === null || value === undefined) return '<span class="text-muted">null</span>';
   if (Array.isArray(value)) {
     if (value.length === 0) return '<span class="text-muted">empty</span>';
-    if (['disallowed', 'allowed', 'sitemaps', 'scripts', 'emails', 'phones'].includes(key)) {
+    if (
+      ['disallowed', 'allowed', 'sitemaps', 'scripts', 'emails', 'phones', 'routes'].includes(key)
+    ) {
       return (
-        '<ul class="bullet-list">' + value.map(v => `<li>${escapeHtml(v)}</li>`).join('') + '</ul>'
+        '<ul class="bullet-list">' +
+        value
+          .map((v, i) => `<li><span class="list-num">${i + 1}.</span> ${escapeHtml(v)}</li>`)
+          .join('') +
+        '</ul>'
       );
     }
     if (typeof value[0] === 'string') {
@@ -355,7 +361,7 @@ function generateHtml(output: ScanOutput): string {
     
     .bullet-list li {
       padding: 0.375rem 0;
-      padding-left: 1.25rem;
+      padding-left: 1.75rem;
       position: relative;
       word-break: break-all;
     }
@@ -365,6 +371,38 @@ function generateHtml(output: ScanOutput): string {
       position: absolute;
       left: 0;
       color: var(--primary);
+    }
+    
+    .bullet-list numbered {
+      counter-reset: list-counter;
+    }
+    
+    .list-num {
+      color: var(--primary);
+      font-weight: 600;
+      margin-right: 0.25rem;
+    }
+    
+    .numbered-list {
+      list-style: none;
+      padding: 0;
+      counter-reset: list-counter;
+    }
+    
+    .numbered-list li {
+      padding: 0.375rem 0;
+      padding-left: 1.75rem;
+      position: relative;
+      word-break: break-all;
+    }
+    
+    .numbered-list li::before {
+      counter-increment: list-counter;
+      content: counter(list-counter) ".";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: 600;
     }
     
     .field {
