@@ -14,6 +14,8 @@ Run modules individually with specific flags, or use `-H` for a full hybrid scan
 
 ## Installation
 
+xrecon is a CLI tool designed to be installed globally so you can run it from anywhere in your terminal.
+
 ### Using npm
 
 ```bash

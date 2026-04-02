@@ -142,7 +142,7 @@ Active modules (in `src/modules/active/`):
 
 ### Dependencies
 
-- **Runtime**: axios, boxen, chalk, cheerio, commander, inquirer, ora, zod
+- **Runtime**: axios, boxen, chalk, cheerio, commander, fuse.js, inquirer, ora, zod
 - **Dev**: typescript, tsdown, vitest, eslint, prettier, playwright
 - Skip bundling node modules in production build
 
@@ -150,13 +150,17 @@ Active modules (in `src/modules/active/`):
 
 ```
 src/
-├── index.ts           # CLI entry point
-├── types.ts           # Shared type definitions
+├── index.ts              # CLI entry point
+├── types.ts              # Shared type definitions
+├── commands/             # CLI command handlers
 ├── utils/
-│   └── get-html.ts    # HTML fetching utility
+│   ├── get-html.ts       # HTML fetching utility
+│   ├── output-cli.ts     # CLI output formatting
+│   ├── output-html.ts    # HTML report generation
+│   └── search.ts         # Module search functionality
 └── modules/
-    ├── passive/       # DNS, WHOIS, etc. (no HTTP needed)
-    └── active/        # HTTP-based scanning modules
+    ├── passive/          # DNS, WHOIS, geo, subdomains, txt, mx (no HTTP needed)
+    └── active/           # HTTP-based scanning modules (19 modules)
 ```
 
 ## Important Notes
@@ -165,3 +169,5 @@ src/
 - Keep modules independent where possible
 - Handle network failures gracefully - don't crash entire scan
 - Use type-safe approaches - avoid `any` when possible
+- Only publish `dist/` directory to npm (configured via `files` in package.json)
+- pnpm version must be consistent: `10.18.1` (in package.json and GitHub workflows)
