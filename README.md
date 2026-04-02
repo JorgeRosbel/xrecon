@@ -64,8 +64,8 @@ xrecon example.com -H -oN results.json
 # Search by keyword
 xrecon search tech
 
-# Search by flag
-xrecon search -T
+# Search by type (active or passive)
+xrecon search passive
 
 # Search by description
 xrecon search email
