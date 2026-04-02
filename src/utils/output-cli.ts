@@ -21,6 +21,7 @@ const MODULE_TYPES: Record<string, 'passive' | 'active'> = {
   ssl: 'active',
   os: 'active',
   metadata: 'active',
+  comments: 'active',
   emails: 'active',
   phones: 'active',
   sitemap: 'active',

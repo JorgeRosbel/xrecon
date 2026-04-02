@@ -159,6 +159,7 @@ export interface Results {
   geo?: ModuleResult<GeoResult>;
   os?: ModuleResult<OSResult>;
   metadata?: ModuleResult<MetadataResult>;
+  comments?: ModuleResult<string[]>;
   emails?: ModuleResult<EmailResult>;
   phones?: ModuleResult<PhoneResult>;
   sitemap?: ModuleResult<SitemapResult>;
