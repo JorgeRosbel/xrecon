@@ -2,6 +2,8 @@
 
 OSINT CLI tool for web reconnaissance - gather passive and active information about websites.
 
+![xrecon screenshot](.github/189_1x_shots_so.png)
+
 ## Installation
 
 ### Using npm
