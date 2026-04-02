@@ -38,7 +38,18 @@ function formatValuePlain(key: string, value: unknown): string {
   if (Array.isArray(value)) {
     if (value.length === 0) return 'empty';
     if (
-      ['disallowed', 'allowed', 'sitemaps', 'scripts', 'routes'].includes(key) &&
+      [
+        'disallowed',
+        'allowed',
+        'sitemaps',
+        'scripts',
+        'routes',
+        'security',
+        'subdomains',
+        'headers',
+        'txt',
+        'comments',
+      ].includes(key) &&
       typeof value[0] === 'string'
     ) {
       return '\n' + value.map((v, i) => `  ${i + 1}. ${v}`).join('\n');
@@ -58,7 +69,18 @@ function formatValue(key: string, value: unknown): string {
   if (Array.isArray(value)) {
     if (value.length === 0) return chalk.gray('empty');
     if (
-      ['disallowed', 'allowed', 'sitemaps', 'scripts', 'routes'].includes(key) &&
+      [
+        'disallowed',
+        'allowed',
+        'sitemaps',
+        'scripts',
+        'routes',
+        'security',
+        'subdomains',
+        'headers',
+        'txt',
+        'comments',
+      ].includes(key) &&
       typeof value[0] === 'string'
     ) {
       return '\n' + value.map((v, i) => `    ${i + 1}. ${v}`).join('\n');
