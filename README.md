@@ -4,6 +4,18 @@ OSINT CLI tool for web reconnaissance - gather passive and active information ab
 
 ## Installation
 
+### Using npm
+
+```bash
+npm install -g @jorge-rosbel/xrecon
+```
+
+### Using pnpm
+
+```bash
+pnpm add -g @jorge-rosbel/xrecon
+```
+
 ### From source
 
 ```bash
