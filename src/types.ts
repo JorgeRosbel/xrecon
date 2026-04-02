@@ -1,4 +1,4 @@
-import type { BrowserContext } from 'playwright-chromium';
+import type { BrowserContext } from 'playwright';
 import * as Cheerio from 'cheerio';
 
 export interface PassiveModule {

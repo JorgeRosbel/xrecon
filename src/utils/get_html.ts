@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { chromium, type Browser, type Page } from 'playwright-chromium';
+import { chromium, type Browser, type Page } from 'playwright';
 import https from 'https';
 import type { SharedHtmlData } from '@/types';
 
@@ -92,9 +92,15 @@ export async function getHtml(url: string, options: GetHtmlOptions = {}): Promis
     const isDynamic = detectDynamicPage($);
 
     if (isDynamic) {
-      const playwrightResult = await fetchWithPlaywright(finalUrl);
-      html = playwrightResult.html;
-      finalUrl = playwrightResult.url;
+      try {
+        const playwrightResult = await fetchWithPlaywright(finalUrl);
+        html = playwrightResult.html;
+        finalUrl = playwrightResult.url;
+      } catch {
+        console.error(
+          '\n⚠ Warning: Dynamic content unavailable. Run "npx playwright install" to enable full scanning of dynamic sites.\n'
+        );
+      }
     }
 
     const final$ = cheerio.load(html);

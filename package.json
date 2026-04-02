@@ -1,6 +1,6 @@
 {
   "name": "@ariaskit/xrecon",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "description": "OSINT CLI tool for web reconnaissance - gather passive and active information about websites.",
   "bin": {
@@ -49,9 +49,6 @@
   "author": "Jorge Rosbel",
   "license": "MIT",
   "packageManager": "pnpm@10.18.1",
-  "onlyBuiltDependencies": [
-    "playwright-chromium"
-  ],
   "devDependencies": {
     "@esbuild-plugins/tsconfig-paths": "^0.1.2",
     "@types/inquirer": "^9.0.8",
@@ -79,7 +76,7 @@
     "fuse.js": "^7.1.0",
     "inquirer": "^12.7.0",
     "ora": "^9.0.0",
-    "playwright-chromium": "^1.58.2",
+    "playwright": "^1.58.2",
     "zod": "^4.1.13"
   }
 }
