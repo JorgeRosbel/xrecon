@@ -43,7 +43,6 @@ function formatValuePlain(key: string, value: unknown): string {
         'disallowed',
         'allowed',
         'sitemaps',
-        'scripts',
         'routes',
         'security',
         'subdomains',
@@ -53,7 +52,29 @@ function formatValuePlain(key: string, value: unknown): string {
       ].includes(key) &&
       typeof value[0] === 'string'
     ) {
-      return '\n' + value.map((v, i) => `  ${i + 1}. ${v}`).join('\n');
+      return '\n' + value.map((_v, i) => `  ${i + 1}. ${value[i]}`).join('\n');
+    }
+
+    if (key === 'scripts' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const scriptsData = value as { scripts?: string[]; modulepreload?: string[] };
+      const lines: string[] = [];
+
+      if (scriptsData.scripts && scriptsData.scripts.length > 0) {
+        lines.push('  Scripts:');
+        scriptsData.scripts.forEach((s, i) => {
+          lines.push(`    ${i + 1}. ${s}`);
+        });
+      }
+
+      if (scriptsData.modulepreload && scriptsData.modulepreload.length > 0) {
+        if (lines.length > 0) lines.push('');
+        lines.push('  Modulepreload:');
+        scriptsData.modulepreload.forEach((s, i) => {
+          lines.push(`    ${i + 1}. ${s}`);
+        });
+      }
+
+      return '\n' + lines.join('\n');
     }
     if (typeof value[0] === 'object' && value[0] !== null) {
       return (
@@ -88,17 +109,40 @@ function formatValue(key: string, value: unknown): string {
         'disallowed',
         'allowed',
         'sitemaps',
-        'scripts',
         'routes',
         'security',
         'subdomains',
         'headers',
         'txt',
         'comments',
+        'scripts',
+        'modulepreload',
       ].includes(key) &&
       typeof value[0] === 'string'
     ) {
-      return '\n' + value.map((v, i) => `    ${i + 1}. ${v}`).join('\n');
+      return '\n' + value.map((_v, i) => `    ${i + 1}. ${value[i]}`).join('\n');
+    }
+
+    if (key === 'scripts' && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      const scriptsData = value as { scripts?: string[]; modulepreload?: string[] };
+      const lines: string[] = [];
+
+      if (scriptsData.scripts && scriptsData.scripts.length > 0) {
+        lines.push('  Scripts:');
+        scriptsData.scripts.forEach((s, i) => {
+          lines.push(`    ${i + 1}. ${s}`);
+        });
+      }
+
+      if (scriptsData.modulepreload && scriptsData.modulepreload.length > 0) {
+        if (lines.length > 0) lines.push('');
+        lines.push('  Modulepreload:');
+        scriptsData.modulepreload.forEach((s, i) => {
+          lines.push(`    ${i + 1}. ${s}`);
+        });
+      }
+
+      return '\n' + lines.join('\n');
     }
     if (typeof value[0] === 'object' && value[0] !== null) {
       return (

@@ -1,7 +1,10 @@
 import type { ActiveModule, ModuleResult, SharedHtmlData } from '@/types';
 import { getHtml } from '@/utils/get_html';
 
-export type ScriptsResult = string[];
+export interface ScriptsResult {
+  scripts: string[];
+  modulepreload: string[];
+}
 
 export const scripts: ActiveModule = {
   name: 'scripts',
@@ -16,27 +19,46 @@ export const scripts: ActiveModule = {
       const { $, url } = data;
       const baseUrl = new URL(url);
 
-      const found: string[] = [];
+      const foundScripts: string[] = [];
+      const foundModulepreload: string[] = [];
 
       $('script[src]').each((_i, el) => {
         let src = $(el).attr('src');
-        if (!src || found.includes(src)) return;
+        if (!src || foundScripts.includes(src)) return;
 
         if (src.startsWith('http://') || src.startsWith('https://')) {
-          found.push(src);
+          foundScripts.push(src);
         } else if (src.startsWith('//')) {
-          found.push(`https:${src}`);
+          foundScripts.push(`https:${src}`);
         } else {
           const absoluteUrl = new URL(src, baseUrl.origin).href;
-          found.push(absoluteUrl);
+          foundScripts.push(absoluteUrl);
         }
       });
 
-      if (found.length === 0) {
+      $('link[rel="modulepreload"][href]').each((_i, el) => {
+        let href = $(el).attr('href');
+        if (!href || foundModulepreload.includes(href)) return;
+
+        if (href.startsWith('http://') || href.startsWith('https://')) {
+          foundModulepreload.push(href);
+        } else if (href.startsWith('//')) {
+          foundModulepreload.push(`https:${href}`);
+        } else {
+          try {
+            const absoluteUrl = new URL(href, baseUrl.origin).href;
+            foundModulepreload.push(absoluteUrl);
+          } catch {
+            // Skip invalid URLs
+          }
+        }
+      });
+
+      if (foundScripts.length === 0 && foundModulepreload.length === 0) {
         return { success: false, error: 'No script tags found' };
       }
 
-      return { success: true, data: found };
+      return { success: true, data: { scripts: foundScripts, modulepreload: foundModulepreload } };
     } catch (error) {
       return {
         success: false,
