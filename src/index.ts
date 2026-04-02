@@ -8,6 +8,25 @@ import ora from 'ora';
 const resolve4 = promisify(dns.resolve4);
 const resolve6 = promisify(dns.resolve6);
 
+const isSearchOrList = process.argv[2] === 'search' || process.argv[2] === 'list';
+
+if (isSearchOrList) {
+  if (process.argv[2] === 'search') {
+    const { searchModules, displaySearchResults } = require('./utils/search');
+    const query = process.argv[3];
+    if (query) {
+      const results = searchModules(query);
+      displaySearchResults(query, results);
+    } else {
+      console.log('Usage: xrecon search <keyword>');
+    }
+  } else if (process.argv[2] === 'list') {
+    const { listAllModules } = require('./utils/search');
+    listAllModules();
+  }
+  process.exit(0);
+}
+
 import { chromium, type Browser, type BrowserContext, type Page } from 'playwright';
 import * as passiveModules from '@/modules/passive';
 import * as activeModules from '@/modules/active';
@@ -255,25 +274,6 @@ program
   .option('-R, --routes', 'Public routes from all sitemaps [ACTIVE]')
   .option('-k, --cookies', 'Detect cookies [ACTIVE]')
   .option('-K, --storage', 'Extract localStorage/sessionStorage and JWT tokens [ACTIVE]');
-
-program
-  .command('search <query>')
-  .description('Search modules by keyword (flag, name, or description)')
-  .action(query => {
-    const { searchModules, displaySearchResults } = require('./utils/search');
-    const results = searchModules(query);
-    displaySearchResults(query, results);
-    process.exit(0);
-  });
-
-program
-  .command('list')
-  .description('List all available modules')
-  .action(() => {
-    const { listAllModules } = require('./utils/search');
-    listAllModules();
-    process.exit(0);
-  });
 
 program.parse(process.argv);
 
