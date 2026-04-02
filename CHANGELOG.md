@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.0.8 - April 2, 2026
+
+### feat: enhance sitemap module to discover all URLs recursively from sitemap indexes
+
+- Complete rewrite of sitemap module to discover all sitemap URLs
+- Now receives sitemap URLs from robots.txt via sharedData
+- Parses XML to extract URLs from both regular sitemaps and sitemap indexes
+- Recursive discovery of nested sitemaps (up to depth 3)
+- Returns sitemapIndexes, sitemaps, and urls (max 1000)
+- Supports fallback to common sitemap paths (/sitemap.xml, /sitemap_index.xml, /sitemap-index.xml)
+
 ## v0.0.7 - April 2, 2026
 
 ### fix: improve tech detection specificity to reduce false positives
