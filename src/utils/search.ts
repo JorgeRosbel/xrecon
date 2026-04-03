@@ -141,6 +141,20 @@ const MODULES: ModuleInfo[] = [
     description: 'Extract localStorage/sessionStorage and JWT tokens',
     type: 'active',
   },
+  {
+    name: 'jssecrets',
+    flag: '-X',
+    longFlag: '--jssecrets',
+    description: 'Scan JS files for secrets and sensitive data',
+    type: 'active',
+  },
+  {
+    name: 'endpoints',
+    flag: '-E',
+    longFlag: '--endpoints',
+    description: 'Extract API endpoints from JS files and forms',
+    type: 'active',
+  },
 ];
 
 const fuse = new Fuse(MODULES, {
@@ -210,6 +224,20 @@ export function listAllModules(): void {
   console.log('\n' + chalk.bold.underline('Active Modules'));
   active.forEach(mod => {
     console.log(`  ${chalk.green(mod.flag)} ${mod.name} - ${mod.description}`);
+  });
+
+  console.log('\n' + chalk.bold.underline('Global Options'));
+  const globalOptions = [
+    { flag: '-H, --hybrid', desc: 'Run both active and passive modules' },
+    { flag: '-P, --passive', desc: 'Run only passive modules' },
+    { flag: '-x, --proxy <url>', desc: 'HTTP/SOCKS proxy URL' },
+    { flag: '-a, --proxy-auth <creds>', desc: 'Proxy authentication (user:pass)' },
+    { flag: '-oN, --output <file>', desc: 'Save output to file (plain text)' },
+    { flag: '-oJ, --output-json [file]', desc: 'Save output as JSON' },
+    { flag: '-oH, --output-html [file]', desc: 'Save output as HTML' },
+  ];
+  globalOptions.forEach(opt => {
+    console.log(`  ${chalk.green(opt.flag)} - ${opt.desc}`);
   });
 
   console.log('\n' + chalk.gray('─'.repeat(50)));

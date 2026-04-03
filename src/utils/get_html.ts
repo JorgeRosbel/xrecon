@@ -1,18 +1,73 @@
-import axios from 'axios';
+import axios, { type AxiosProxyConfig } from 'axios';
 import * as cheerio from 'cheerio';
 import { chromium, type Browser, type Page } from 'playwright';
 import https from 'https';
 import type { SharedHtmlData } from '@/types';
 
-export interface GetHtmlOptions {
-  insecure?: boolean;
+export interface ProxyConfig {
+  url: string;
+  auth?: { username: string; password: string };
 }
 
-async function fetchWithPlaywright(url: string): Promise<{ html: string; url: string }> {
+export interface GetHtmlOptions {
+  insecure?: boolean;
+  proxy?: ProxyConfig;
+}
+
+function parseProxyUrl(proxyUrl: string): {
+  protocol: string;
+  host: string;
+  port: number;
+} {
+  const url = new URL(proxyUrl);
+  return {
+    protocol: url.protocol.replace(':', ''),
+    host: url.hostname,
+    port: parseInt(url.port) || (url.protocol === 'https:' || url.protocol === 'http:' ? 80 : 1080),
+  };
+}
+
+function buildAxiosProxyConfig(proxy?: ProxyConfig): AxiosProxyConfig | false {
+  if (!proxy) return false;
+
+  const { protocol, host, port } = parseProxyUrl(proxy.url);
+
+  const config: AxiosProxyConfig = {
+    protocol,
+    host,
+    port,
+  };
+
+  if (proxy.auth) {
+    config.auth = {
+      username: proxy.auth.username,
+      password: proxy.auth.password,
+    };
+  }
+
+  return config;
+}
+
+async function fetchWithPlaywright(
+  url: string,
+  proxy?: ProxyConfig
+): Promise<{ html: string; url: string }> {
   let browser: Browser | null = null;
 
   try {
-    browser = await chromium.launch({ headless: true });
+    const proxyServer = proxy?.url;
+    const proxyCredentials = proxy?.auth;
+
+    browser = await chromium.launch({
+      headless: true,
+      proxy: proxyServer
+        ? {
+            server: proxyServer,
+            username: proxyCredentials?.username,
+            password: proxyCredentials?.password,
+          }
+        : undefined,
+    });
     const context = await browser.newContext({
       userAgent:
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -68,11 +123,16 @@ function detectDynamicPage($: cheerio.CheerioAPI): boolean {
   );
 }
 
-export async function getHtml(url: string, options: GetHtmlOptions = {}): Promise<SharedHtmlData> {
+export async function getHtml(
+  url: string,
+  options: GetHtmlOptions = {},
+  proxyConfig?: ProxyConfig
+): Promise<SharedHtmlData> {
   const { insecure = true } = options;
 
   try {
     const httpsAgent = insecure ? new https.Agent({ rejectUnauthorized: false }) : undefined;
+    const proxyAxios = buildAxiosProxyConfig(proxyConfig);
 
     const response = await axios.get(url, {
       timeout: 10000,
@@ -83,6 +143,7 @@ export async function getHtml(url: string, options: GetHtmlOptions = {}): Promis
       maxRedirects: 5,
       validateStatus: status => status !== 404,
       httpsAgent,
+      proxy: proxyAxios,
     });
 
     let html = typeof response.data === 'string' ? response.data : '';
@@ -93,7 +154,7 @@ export async function getHtml(url: string, options: GetHtmlOptions = {}): Promis
 
     if (isDynamic) {
       try {
-        const playwrightResult = await fetchWithPlaywright(finalUrl);
+        const playwrightResult = await fetchWithPlaywright(finalUrl, proxyConfig);
         html = playwrightResult.html;
         finalUrl = playwrightResult.url;
       } catch {

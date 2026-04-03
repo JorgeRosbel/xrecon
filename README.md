@@ -85,15 +85,17 @@ xrecon example.com -H -oN results.json
 
 ### Global Options
 
-| Flag                        | Description                                     |
-| --------------------------- | ----------------------------------------------- |
-| `-H, --hybrid`              | Run both active and passive modules             |
-| `-P, --passive`             | Run only passive modules                        |
-| `-oN, --output <file>`      | Save output to file (plain text)                |
-| `-oJ, --output-json [file]` | Save output as JSON file (default: output.json) |
-| `-oH, --output-html [file]` | Save output as HTML file (default: output.html) |
-| `-V, --version`             | Show version number                             |
-| `--help`                    | Display help information                        |
+| Flag                        | Description                                      |
+| --------------------------- | ------------------------------------------------ |
+| `-H, --hybrid`              | Run both active and passive modules              |
+| `-P, --passive`             | Run only passive modules                         |
+| `-oN, --output <file>`      | Save output to file (plain text)                 |
+| `-oJ, --output-json [file]` | Save output as JSON file (default: output.json)  |
+| `-oH, --output-html [file]` | Save output as HTML file (default: output.html)  |
+| `-x, --proxy <url>`         | HTTP/SOCKS proxy URL (e.g., http://proxy:8080)   |
+| `-a, --proxy-auth <creds>`  | Proxy authentication (format: username:password) |
+| `-V, --version`             | Show version number                              |
+| `--help`                    | Display help information                         |
 
 ### Search & List Commands
 
@@ -254,6 +256,19 @@ xrecon search -w
 
 # Find modules by keyword
 xrecon search email
+```
+
+### Using Proxy
+
+```bash
+# With HTTP proxy
+xrecon example.com -H -x http://proxy.example.com:8080
+
+# With proxy and authentication
+xrecon example.com -H -x http://proxy.example.com:8080 -a user:password
+
+# With SOCKS5 proxy
+xrecon example.com -H -x socks5://proxy.example.com:1080
 ```
 
 ## Requirements

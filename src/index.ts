@@ -35,7 +35,7 @@ import { generateHtmlOutput } from '@/utils/output-html';
 import { formatCliOutput, formatCliOutputPlain } from '@/utils/output-cli';
 import type { Results, ScanOutput, SharedHtmlData } from '@/types';
 
-const VERSION = '0.1.0';
+const VERSION = '0.1.1';
 
 function normalizeUrl(input: string): string {
   if (!input.startsWith('http://') && !input.startsWith('https://')) {
@@ -62,6 +62,25 @@ async function validateDomain(hostname: string): Promise<boolean> {
 
 async function runModules() {
   const opts = program.opts();
+
+  const proxyConfig = opts.proxy
+    ? {
+        url: opts.proxy,
+        auth: opts.proxyAuth
+          ? (() => {
+              const [username, password] = opts.proxyAuth.split(':');
+              return { username, password };
+            })()
+          : undefined,
+      }
+    : undefined;
+
+  if (proxyConfig) {
+    console.error(chalk.cyan(`Using proxy: ${proxyConfig.url}`));
+    if (proxyConfig.auth) {
+      console.error(chalk.cyan('Proxy authentication enabled'));
+    }
+  }
 
   let target = program.args[0];
   if (!target) {
@@ -128,7 +147,7 @@ async function runModules() {
 
   if (runActive) {
     try {
-      sharedHtmlData = await getHtml(target);
+      sharedHtmlData = await getHtml(target, { insecure: true }, proxyConfig);
 
       if (needsPlaywright(activeToRun)) {
         browser = await chromium.launch({ headless: true });
@@ -277,7 +296,12 @@ program
   .option('-k, --cookies', 'Detect cookies [ACTIVE]')
   .option('-K, --storage', 'Extract localStorage/sessionStorage and JWT tokens [ACTIVE]')
   .option('-X, --jssecrets', 'Scan JS files for secrets and sensitive data [ACTIVE]')
-  .option('-E, --endpoints', 'Extract API endpoints from JS files and forms [ACTIVE]');
+  .option('-E, --endpoints', 'Extract API endpoints from JS files and forms [ACTIVE]')
+  .option(
+    '-x, --proxy <url>',
+    'HTTP/SOCKS proxy URL (e.g., http://proxy:8080, socks5://proxy:1080)'
+  )
+  .option('-a, --proxy-auth <creds>', 'Proxy authentication (format: username:password)');
 
 program.parse(process.argv);
 

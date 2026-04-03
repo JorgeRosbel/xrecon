@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.1.1 - April 3, 2026
+
+### feat: add proxy support for HTTP requests
+
+- New `-x, --proxy` flag to route HTTP requests through HTTP/SOCKS proxy
+- New `-a, --proxy-auth` flag for proxy authentication (format: username:password)
+- Proxy support works with both axios (static HTML) and Playwright (dynamic content)
+- Added "Global Options" section to `xrecon list` output
+- Added jssecrets and endpoints modules to the searchable module list
+
+### docs: update README with proxy usage examples
+
+- Documented new proxy flags in global options table
+- Added usage examples for HTTP proxy, authenticated proxy, and SOCKS5
+
 ## v0.1.0 - April 2, 2026
 
 ### feat: add endpoints module to extract API endpoints from JS files and forms

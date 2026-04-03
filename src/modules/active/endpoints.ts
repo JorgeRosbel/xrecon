@@ -268,9 +268,8 @@ function extractEndpointsFromJs(jsContent: string, baseUrl: string, fileName: st
   return endpoints;
 }
 
-function extractEndpointsFromForms($: cheerio.CheerioAPI, baseUrl: string): Endpoint[] {
+function extractEndpointsFromForms($: cheerio.CheerioAPI): Endpoint[] {
   const endpoints: Endpoint[] = [];
-  const baseOrigin = new URL(baseUrl).origin;
 
   $('form[action]').each((_i, el) => {
     const action = $(el).attr('action');
@@ -309,7 +308,6 @@ export const endpoints: ActiveModule = {
           : `https://${target}`;
 
       const baseUrl = fullUrl;
-      const origin = new URL(baseUrl).origin;
       const allEndpoints: Endpoint[] = [];
       const processedFiles = new Set<string>();
 
@@ -340,7 +338,7 @@ export const endpoints: ActiveModule = {
 
       if (sharedData?.html) {
         const $ = cheerio.load(sharedData.html);
-        const formEndpoints = extractEndpointsFromForms($, baseUrl);
+        const formEndpoints = extractEndpointsFromForms($);
         allEndpoints.push(...formEndpoints);
       }
 
